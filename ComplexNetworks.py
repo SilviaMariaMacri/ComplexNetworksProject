@@ -52,7 +52,7 @@ sapiens=sapiens[sapiens['combined_score']>400]
 
 
 # create dataframe of virus-human interactions
-virus = pd.read_csv('string_interactions_HIV1_500more.tsv', sep="\t", 
+virus = pd.read_csv('string_interactions_HIV1_500.tsv', sep="\t", 
 				   usecols=['node1_external_id','node2_external_id', 'combined_score'])
 
 
@@ -162,7 +162,7 @@ index_node_to_remove = np.arange(len(ND)) # create an array of indexes for the n
 random_index = np.random.shuffle(index_node_to_remove) # shuffle indexes
 		
 for i in range(len(ND)): 
-	# remove nodes following the random order of random_indexes 
+	# remove nodes following the random order of random_index 
 	GH.remove_node(ND.iloc[random_index[i]][0])
 	print('removed node (with degree): ') 
 	print(ND.iloc[random_index[i]])
@@ -226,11 +226,22 @@ for j in range(len(hitnodes)):
 
 
 
-#%%
+#%%  BETWEENNESS CENTRALITY
 
-nx.betweenness_centrality(GV., weigh ='weight')
+'''
+#calculate BC
+BC = nx.betweenness_centrality(GH, weight ='weights') 
+
+#convert dict to dataframe
+BCdf = pd.DataFrame.from_dict(BC,orient='index')
+
+#create file .txt with BC values
+BCdf.to_csv('BC.txt', index=True) 
+'''
+
+#import BC file as dataframe
+BC = pd.read_csv('BC.txt', sep=",", skiprows=1)
 
 
-#convertire dict in daraframe
-a=pd.DataFrame.from_dict(nx.betweenness_centrality(GV),orient='index')
-a.to_csv('percolation.csv', index=False)
+
+
