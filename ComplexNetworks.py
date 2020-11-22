@@ -1,7 +1,7 @@
 '''
 HOMO SAPIENS = 9606.
-HIV1 = 11676.
-
+Human immunodeficiency virus type 1 group M subtype B (isolate HXB2) = 11676.
+Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320.
 
 
 
@@ -28,7 +28,7 @@ import pandas as pd
 import networkx as nx
 
 
-
+#directory = 'C:\Users\silvi\Downloads'
 directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/dati'
 os.chdir(directory) 
 
@@ -82,7 +82,7 @@ GH_reference = GH.copy(as_view=False)
 # select only links with virus protein as starting node and human protein as arrival node 
 interactionsVH = []	
 for i in range(len(virus)):
-	if virus.iloc[i,0].startswith('11676.')==True & virus.iloc[i,1].startswith('9606.')==True:
+	if virus.iloc[i,0].startswith('11320.')==True & virus.iloc[i,1].startswith('9606.')==True:
 		interactionsVH.append(virus.iloc[i])
 		
 
