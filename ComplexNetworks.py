@@ -5,6 +5,19 @@ Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320.
 
 
 
+COMMENTI:
+- riga 164: a me funziona, cmq ho lasciato anche il ciclo for, è equivalente 
+- intorno a 285: non mi funzionava la selezione della betweenness. 
+  credo perchè dopo aver creato il dataframe vuoto non c'era un comando che 
+  gli facesse aggiungere una riga ad ogni ciclo. Non sono riuscita a trovarlo 
+  quindi ho messo quelle altre righe che dovrebbero funzionare lo stesso
+- grafico: ho messo una funzione che fa tutto, l'ho copiata da un'altro programma,
+  dovrebbe fare grafici un po' più carini   
+  
+
+
+
+
 
 
 DUBBI E PROBLEMI: 
