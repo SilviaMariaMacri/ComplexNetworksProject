@@ -12,7 +12,8 @@ COMMENTI:
   gli facesse aggiungere una riga ad ogni ciclo. Non sono riuscita a trovarlo 
   quindi ho messo quelle altre righe che dovrebbero funzionare lo stesso
 - grafico: ho messo una funzione che fa tutto, l'ho copiata da un'altro programma,
-  dovrebbe fare grafici un po' più carini   
+  dovrebbe fare grafici un po' più carini 
+  PROBLEMA. grafico della percolation nell'articolo: perchè la size normalizzata va a zero?' 
   
 
 
@@ -355,11 +356,11 @@ def graph_percolation(percol):
 	
 	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,6))
 	x_axis = percol['removed_nodes']/percol['removed_nodes'].iloc[len(percol)-1]
-	ax.plot(x_axis, percol['sizeG_random'], label='random', linewidth=0.75)
-	ax.plot(x_axis, percol['sizeG_degree'], label='degree', linewidth=0.75)
-	ax.plot(x_axis, percol['sizeG_BC'], label='betweenness', linewidth=0.75)
+	ax.plot(x_axis, percol['sizeG_random']/percol['sizeG_random'][0], label='random', linewidth=0.75)
+	ax.plot(x_axis, percol['sizeG_degree']/percol['sizeG_degree'][0], label='degree', linewidth=0.75)
+	ax.plot(x_axis, percol['sizeG_BC']/percol['sizeG_BC'][0], label='betweenness', linewidth=0.75)
 	ax.set_xlabel('% of removed nodes')
-	ax.set_ylabel('Size of giant component')
+	ax.set_ylabel('Normalized size of giant component')
 	ax.legend(ncol=1 ,loc='best', fontsize=14)
 	plt.show()
 	
