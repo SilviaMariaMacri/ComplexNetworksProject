@@ -1,7 +1,7 @@
 '''
 HOMO SAPIENS = 9606.
 Human immunodeficiency virus type 1 group M subtype B (isolate HXB2) = 11676.
-Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320.
+Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320. (max 514 nodi)
 
 
 
@@ -82,7 +82,7 @@ GH_reference = GH.copy(as_view=False)
 # select only links with virus protein as starting node and human protein as arrival node 
 interactionsVH = []	
 for i in range(len(virus)):
-	if virus.iloc[i,0].startswith('11320.')==True & virus.iloc[i,1].startswith('9606.')==True:
+	if virus.iloc[i,0].startswith('11676.')==True & virus.iloc[i,1].startswith('9606.')==True:
 		interactionsVH.append(virus.iloc[i])
 		
 
@@ -158,8 +158,8 @@ size_G_single = len(max(nx.strongly_connected_components(GH)))
 sizeG.append(size_G_single) 
 
 		
-index_node_to_remove = np.arange(len(ND)) # create an array of indexes for the nodes
-random_index = np.random.shuffle(index_node_to_remove) # shuffle indexes
+random_index = np.arange(len(ND)) # create an array of indexes for the nodes
+np.random.shuffle(random_index) # shuffle indexes
 		
 for i in range(len(ND)): 
 	# remove nodes following the random order of random_index 
