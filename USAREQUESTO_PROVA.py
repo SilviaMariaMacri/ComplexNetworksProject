@@ -87,12 +87,16 @@ GV = Percolation.VirusGraph(virus,'11676.')
 ################### define dataframes and array of hit nodes, degree and BC 
 '''
 
+#create dataframe of hit nodes and corresponding degrees
 ND = Percolation.NodeDegreeDF(GH,GV)
+
+#create array of hit nodes
 hitnodes = Percolation.Hitnodes(GH,GV)
 
 #import BC file as dataframe
 BC = pd.read_csv('BetweennessCentrality2.csv', sep=",", skiprows=1)
-  
+ 
+#create dataframe of hit nodes and corresponding betweenness 
 BC_sorted = Percolation.NodeBetweennessDF(GH,GV,BC)
 
 
@@ -167,7 +171,7 @@ percol = pd.read_csv('percolation_nomevirus.txt', sep=",")
 
 
 
-
+#plot
 Percolation.GraphPercolation(percol)
 
 
