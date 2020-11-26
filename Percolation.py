@@ -257,8 +257,8 @@ def GraphPercolation(percol,nameplot):
 	ax.set_xlabel('% of removed nodes')
 	ax.set_ylabel('Size of giant component')
 	ax.legend(ncol=1 ,loc='best', fontsize=14)
-	plt.show()
 	plt.savefig(nameplot)
+	plt.show()
 	
 	return
 
