@@ -14,8 +14,8 @@ import pandas as pd
 
 
 #directory = 'C:\Users\silvi\Downloads'
-#directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/dati'
-directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/data'
+directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/dati'
+#directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/data'
 os.chdir(directory) 
 
 

@@ -246,7 +246,7 @@ def PercolationBetweenness(GH,BC_sorted):
 
 #   GRAPH
 
-def GraphPercolation(percol):
+def GraphPercolation(percol,nameplot):
 	sns.set_style('whitegrid')
 	
 	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,6))
@@ -258,6 +258,7 @@ def GraphPercolation(percol):
 	ax.set_ylabel('Size of giant component')
 	ax.legend(ncol=1 ,loc='best', fontsize=14)
 	plt.show()
+	plt.savefig(nameplot)
 	
 	return
 
