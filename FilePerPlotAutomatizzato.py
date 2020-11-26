@@ -1,4 +1,14 @@
 '''
+NOTE:
+	- errore: GH non era ricreata dopo BC_percolation CORRETTO
+	- nodi di human PPI
+
+
+
+
+
+
+
 HOMO SAPIENS = 9606.
 Human immunodeficiency virus type 1 group M subtype B (isolate HXB2) = 11676.
 Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320.
@@ -45,11 +55,9 @@ GH_reference = GH.copy(as_view=False)
 
 
 #quanti file dati di virus abbiamo?
-NumberOfViruses = 2 
+NumberOfViruses = 1#2 
 # list of names of virus data
-NameVirusFile = ['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
-# list of characteristic virus codes 
-VirusCode = ['11676.','11320.']
+NameVirusFile = ['string_interactions_HIV_piccola.tsstring_interactions_influenzaA_piccola.tsv']
 # list of names of the file storing the size of the giant component
 FileNamePercolation = ['PercolationHIV.txt','PercolationInfluenzaA.txt']
 # list of names of final plots
@@ -57,6 +65,5 @@ PlotName = ['plotHIV.png','plotInfluenzaA.png']
 
 
 for i in range(NumberOfViruses):
-	IterativePercolation.PercolationCode(GH,GH_reference,NameVirusFile[i],VirusCode[i],FileNamePercolation[i],PlotName[i])
-
+	IterativePercolation.PercolationCode(GH,GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
 
