@@ -28,7 +28,7 @@ import IterativePercolation
 sapiens = pd.read_csv('9606.protein.links.v11.0.txt', sep=" ", 
                     usecols=['protein1', 'protein2', 'combined_score']) 
 #select human PPI links depending on the score
-sapiens=sapiens[sapiens['combined_score']>900]
+sapiens=sapiens[sapiens['combined_score']>400]
 
 
 
@@ -50,7 +50,7 @@ NumberOfViruses = 2
 NameVirusFile = ['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
 # list of characteristic virus codes 
 VirusCode = ['11676.','11320.']
-#
+# list of names of the file storing the size of the giant component
 FileNamePercolation = ['PercolationHIV.txt','PercolationInfluenzaA.txt']
 # list of names of final plots
 PlotName = ['plotHIV.png','plotInfluenzaA.png']
