@@ -1,0 +1,265 @@
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+
+
+
+
+
+
+
+def HumanGraph(sapiens):
+	
+	# create a directed graph of human PPI
+	GH = nx.DiGraph() 
+	for i in range(len(sapiens)):
+		GH.add_edge(sapiens.iloc[i][0], sapiens.iloc[i][1], weight=sapiens.iloc[i][2])
+		
+	return GH
+
+
+
+
+
+
+
+# example: string = '11676.'
+def VirusGraph(virus,string):
+	
+	# select only links with virus protein as starting node and human protein as arrival node 
+	interactionsVH = []    
+	for i in range(len(virus)):
+		if virus.iloc[i,0].startswith(string)==True & virus.iloc[i,1].startswith('9606.')==True:
+			interactionsVH.append(virus.iloc[i])
+        
+
+	#create a directed graph of virus-human interactions        
+	GV = nx.DiGraph() 
+	for i in range(len(interactionsVH)): 
+		GV.add_edge(interactionsVH[i][0], interactionsVH[i][1], weight=interactionsVH[i][2])
+        
+	return GV
+
+
+
+
+
+
+
+
+def NodeDegreeDF(GH,GV):
+	
+	# create an array of human proteins hit by the virus
+	hitnodes=[]
+	for i in nx.nodes(GV):
+		if i.startswith('9606.')==True:
+			hitnodes.append(i)
+			
+	# create an array of degree values of human proteins hit by the virus
+	# (the indexing is the same than the array hitnodes)
+	degree=[]
+	for i in range(len(hitnodes)):
+		degree.append(nx.degree(GH,hitnodes[i]))    
+		
+		
+	# create dataframe of two columns: nodes hit by the virus and the corresponding degree
+	columns_nodes_degree = {'nodes': hitnodes, 'degree': degree}
+	ND = pd.DataFrame(data=columns_nodes_degree)        
+	#len(ND)
+	
+	# create an array with the indexes of nodes corresponding to human proteins that 
+	# are absent in GH because of the initial score-based selection
+	index_absent_node=[]
+	for i in range(len(ND)): 
+		if type(ND['degree'][i])!=int:
+			index_absent_node.append(i)
+	#len(indici)
+    
+    
+	# erase rows of ND that correspond to absent nodes in GH
+	ND = ND.drop(index_absent_node)        
+	# reindex ND 
+	ND.index = np.arange(0,len(ND),1)
+	#len(ND)
+	
+	
+	return ND
+
+
+
+
+
+
+
+
+def Hitnodes(GH,GV):
+	
+	ND = NodeDegreeDF(GH,GV)
+
+	# recreate a new array of hit nodes that are all present in GH
+	hitnodes = np.array(ND['nodes'])
+	
+	return hitnodes
+
+
+
+
+
+
+
+
+
+def NodeBetweennessDF(GH,GV,BC):
+	
+	hitnodes = Hitnodes(GH,GV)
+	
+	# select only BC values of hit proteins			
+	BCnodes = []
+	BCbetweenness = []			
+	for i in range(len(hitnodes)):
+		BCrow = BC[BC['Nodi']==hitnodes[i]]
+		BCnodes.append(BCrow.iloc[0][0])
+		BCbetweenness.append(BCrow.iloc[0][1])
+	
+	
+	# create a dataframe with hit nodes and corresponding betweenness centrality
+	columns_nodes_BC = {'nodes': BCnodes, 'BC': BCbetweenness}
+	BCselection = pd.DataFrame(data=columns_nodes_BC) 	
+
+	# Sorting BCselection dataframe according to BC value (from largest to lowest)
+	BC_sorted = BCselection.sort_values(by='BC', ascending=False)
+	# reindex BC_sorted 
+	BC_sorted.index = np.arange(0,len(BC_sorted),1)
+	
+	
+	return BC_sorted
+
+
+
+
+
+
+
+
+
+# RANDOM PERCOLATION 
+        
+def PercolationRandom(GH,ND):
+	
+	sizeG_single = len(max(nx.strongly_connected_components(GH)))
+	sizeG=[] #create an empty array for the size of the giant component over time
+	sizeG.append(sizeG_single)
+	
+	random_index = np.arange(len(ND)) # create an array of indexes for the nodes
+	np.random.shuffle(random_index) # shuffle indexes
+        
+	for i in range(len(ND)):
+		# remove nodes following the random order of random_index
+		GH.remove_node(ND.iloc[random_index[i]][0])
+		# calculate the size of the giant component
+		sizeG_single = len(max(nx.strongly_connected_components(GH)))
+		sizeG.append(sizeG_single) 
+    
+	return sizeG
+
+
+
+
+
+
+
+
+
+
+# DEGREE-BASED PERCOLATION
+
+def PercolationDegree(GH,ND,hitnodes):
+	
+	sizeG_single = len(max(nx.strongly_connected_components(GH)))
+	sizeG=[] #create an empty array for the size of the giant component over time
+	sizeG.append(sizeG_single)         
+
+	# node of maximum degree 
+	node_to_remove = ND[ND['degree']==max(ND['degree'])]
+
+	for j in range(len(hitnodes)):
+		#remove the node with maximum degree
+		GH.remove_node(node_to_remove.iloc[0][0]) 
+
+	    # calculate the size of the giant component
+		sizeG_single = len(max(nx.strongly_connected_components(GH)))
+		sizeG.append(sizeG_single)
+    
+	    # erase from ND the row corresponding to the just erased node of GH
+		index_removed_node = ND[ND['nodes']==node_to_remove.iloc[0][0]].index
+		ND = ND.drop(index_removed_node)
+		ND.index =np.arange(0,len(ND),1) # reindex ND
+    
+	    # calculate again the degree of every node
+		if len(ND)>0:
+			for i in range(len(ND)): 
+				ND.iloc[i][1] = nx.degree(GH,ND.iloc[i][0]) 
+			node_to_remove = ND[ND['degree']==max(ND['degree'])]
+    
+	
+	return sizeG
+
+
+
+
+
+
+
+
+
+#  BETWEENNESS CENTRALITY - BASED PERCOLATION 
+
+def PercolationBetweenness(GH,BC_sorted):
+	
+	sizeG_single = len(max(nx.strongly_connected_components(GH)))
+	sizeG = [] #create an empty array for the size of the giant component over time
+	sizeG.append(sizeG_single) 
+
+
+	for i in range (len(BC_sorted)):
+		# remove nodes following the descending order of betweenness
+		GH.remove_node(BC_sorted.iloc[i][0])
+		# calculate the size of the giant component
+		sizeG_single = len(max(nx.strongly_connected_components(GH)))
+		sizeG.append(sizeG_single) 
+		
+		
+	return sizeG
+    
+
+
+
+
+
+
+
+
+
+
+#   GRAPH
+
+def GraphPercolation(percol,nameplot):
+	sns.set_style('whitegrid')
+	
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,6))
+	x_axis = percol['removed_nodes']/percol['removed_nodes'].iloc[len(percol)-1]
+	ax.plot(x_axis, percol['sizeG_random'], label='random', linewidth=0.75)
+	ax.plot(x_axis, percol['sizeG_degree'], label='degree', linewidth=0.75)
+	ax.plot(x_axis, percol['sizeG_BC'], label='betweenness', linewidth=0.75)
+	ax.set_xlabel('% of removed nodes')
+	ax.set_ylabel('Size of giant component')
+	ax.legend(ncol=1 ,loc='best', fontsize=14)
+	plt.savefig(nameplot)
+	plt.show()
+	
+	return
+
+
