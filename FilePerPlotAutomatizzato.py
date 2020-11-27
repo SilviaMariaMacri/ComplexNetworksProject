@@ -51,13 +51,13 @@ GH = Percolation.HumanGraph(sapiens)
 GH_reference = GH.copy(as_view=False)
 
 
-
+#%%
 
 
 #quanti file dati di virus abbiamo?
-NumberOfViruses = 1#2 
+NumberOfViruses = 2 
 # list of names of virus data
-NameVirusFile = ['string_interactions_HIV_piccola.tsstring_interactions_influenzaA_piccola.tsv']
+NameVirusFile = ['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
 # list of names of the file storing the size of the giant component
 FileNamePercolation = ['PercolationHIV.txt','PercolationInfluenzaA.txt']
 # list of names of final plots
@@ -65,5 +65,5 @@ PlotName = ['plotHIV.png','plotInfluenzaA.png']
 
 
 for i in range(NumberOfViruses):
-	IterativePercolation.PercolationCode(GH,GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
+	IterativePercolation.PercolationCode(GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
 

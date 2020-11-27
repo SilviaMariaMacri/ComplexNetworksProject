@@ -49,15 +49,29 @@ def VirusGraph(virus):
 
 
 
-
-
-def NodeDegreeDF(GH,GV):
+def HitnodesNonSelectedString(GV):
 	
 	# create an array of human proteins hit by the virus
 	hitnodes=[]
 	for i in nx.nodes(GV):
 		if i.startswith('9606.')==True:
 			hitnodes.append(i)
+			
+	return hitnodes
+
+
+
+
+
+
+
+def NodeDegreeDF(GH,GV,hitnodes):
+	
+	# create an array of human proteins hit by the virus
+	#hitnodes=[]
+	#for i in nx.nodes(GV):
+	#	if i.startswith('9606.')==True:
+	#		hitnodes.append(i)
 			
 	# create an array of degree values of human proteins hit by the virus
 	# (the indexing is the same than the array hitnodes)
@@ -95,10 +109,10 @@ def NodeDegreeDF(GH,GV):
 
 
 
-
-def Hitnodes(GH,GV):
+# selection of hitnodes present in GH
+def Hitnodes(GH,GV,hitnodes):
 	
-	ND = NodeDegreeDF(GH,GV)
+	ND = NodeDegreeDF(GH,GV,hitnodes)
 
 	# recreate a new array of hit nodes that are all present in GH
 	hitnodes = np.array(ND['nodes'])
@@ -113,15 +127,15 @@ def Hitnodes(GH,GV):
 
 
 
-def NodeBetweennessDF(GH,GV,BC):
+def NodeBetweennessDF(GH,GV,BC,hitnodes):
 	
-	hitnodes = Hitnodes(GH,GV)
+	hitnodesBC = Hitnodes(GH,GV,hitnodes)
 	
 	# select only BC values of hit proteins			
 	BCnodes = []
 	BCbetweenness = []			
-	for i in range(len(hitnodes)):
-		BCrow = BC[BC['Nodi']==hitnodes[i]]
+	for i in range(len(hitnodesBC)):
+		BCrow = BC[BC['Nodi']==hitnodesBC[i]]
 		BCnodes.append(BCrow.iloc[0][0])
 		BCbetweenness.append(BCrow.iloc[0][1])
 	

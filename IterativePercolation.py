@@ -15,7 +15,12 @@ import Percolation
 
 
 
-def PercolationCode(GH,GH_reference,nomefilevirus,FileNamePercolation,nameplot):
+def PercolationCode(GH_reference,nomefilevirus,FileNamePercolation,nameplot):
+	
+	
+	# recreate the original GH graph
+	GH = GH_reference.copy(as_view=False)
+	
 	
 	
 	# create dataframe of virus-human interactions
@@ -26,19 +31,26 @@ def PercolationCode(GH,GH_reference,nomefilevirus,FileNamePercolation,nameplot):
 	# create a directed graph of virus-human interactions 
 	GV = Percolation.VirusGraph(virus)
 
+	
 
+
+	
+	hitnodes = Percolation.HitnodesNonSelectedString(GV)
 
 	#create dataframe of hit nodes and corresponding degrees
-	ND = Percolation.NodeDegreeDF(GH,GV)
+	ND = Percolation.NodeDegreeDF(GH,GV,hitnodes)
 
 	#create array of hit nodes
-	hitnodes = Percolation.Hitnodes(GH,GV)
+	hitnodes = Percolation.Hitnodes(GH,GV,hitnodes)
 
 	#import BC file as dataframe
 	BC = pd.read_csv('BetweennessCentrality2.csv', sep=",", skiprows=1)
  
 	#create dataframe of hit nodes and corresponding betweenness 
-	BC_sorted = Percolation.NodeBetweennessDF(GH,GV,BC)
+	BC_sorted = Percolation.NodeBetweennessDF(GH,GV,BC,hitnodes)
+
+
+
 
 
 
@@ -59,8 +71,7 @@ def PercolationCode(GH,GH_reference,nomefilevirus,FileNamePercolation,nameplot):
 	#BETWEENNESS CENTRALITY - BASED PERCOLATION
 	sizeG_BC = Percolation.PercolationBetweenness(GH,BC_sorted)
 
-	# recreate the original GH graph
-	GH = GH_reference.copy(as_view=False)
+	
 
 
 
