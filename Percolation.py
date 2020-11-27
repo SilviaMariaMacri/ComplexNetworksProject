@@ -26,13 +26,14 @@ def HumanGraph(sapiens):
 
 
 
-# example: string = '11676.'
-def VirusGraph(virus,string):
+
+def VirusGraph(virus):
 	
 	# select only links with virus protein as starting node and human protein as arrival node 
 	interactionsVH = []    
 	for i in range(len(virus)):
-		if virus.iloc[i,0].startswith(string)==True & virus.iloc[i,1].startswith('9606.')==True:
+		#if virus.iloc[i,0].startswith(string)==True & virus.iloc[i,1].startswith('9606.')==True:
+		if virus.iloc[i,0].startswith('9606.')!=True & virus.iloc[i,1].startswith('9606.')==True:	
 			interactionsVH.append(virus.iloc[i])
         
 

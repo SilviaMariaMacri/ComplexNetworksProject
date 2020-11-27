@@ -13,9 +13,9 @@ os.chdir(directory)
 import Percolation
 
 
-#nomefilevirus,codicevirus devono essere stringhe
 
-def PercolationCode(GH,GH_reference,nomefilevirus,codicevirus,FileNamePercolation,nameplot):
+
+def PercolationCode(GH,GH_reference,nomefilevirus,FileNamePercolation,nameplot):
 	
 	
 	# create dataframe of virus-human interactions
@@ -24,7 +24,7 @@ def PercolationCode(GH,GH_reference,nomefilevirus,codicevirus,FileNamePercolatio
 
 
 	# create a directed graph of virus-human interactions 
-	GV = Percolation.VirusGraph(virus,codicevirus)
+	GV = Percolation.VirusGraph(virus)
 
 
 
@@ -59,6 +59,10 @@ def PercolationCode(GH,GH_reference,nomefilevirus,codicevirus,FileNamePercolatio
 	#BETWEENNESS CENTRALITY - BASED PERCOLATION
 	sizeG_BC = Percolation.PercolationBetweenness(GH,BC_sorted)
 
+	# recreate the original GH graph
+	GH = GH_reference.copy(as_view=False)
+
+
 
 
 
@@ -74,6 +78,9 @@ def PercolationCode(GH,GH_reference,nomefilevirus,codicevirus,FileNamePercolatio
 
 	#import file as dataframe
 	percol = pd.read_csv(FileNamePercolation, sep=",")
+
+
+
 
 
 
