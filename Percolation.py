@@ -127,9 +127,9 @@ def Hitnodes(GH,hitnodes):
 
 
 
-def NodeBetweennessDF(GH,BC,hitnodes):
+def NodeBetweennessDF(GH,BC,hitnodesBC):
 	
-	hitnodesBC = Hitnodes(GH,hitnodes)
+	#hitnodesBC = Hitnodes(GH,hitnodes)
 	
 	# select only BC values of hit proteins			
 	BCnodes = []
