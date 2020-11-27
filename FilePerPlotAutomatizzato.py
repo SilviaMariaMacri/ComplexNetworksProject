@@ -3,6 +3,7 @@ NOTE:
 	- errore: GH non era ricreata dopo BC_percolation CORRETTO
 	- nodi di human PPI
 
+- calcolare altre misure di centrality?
 
 
 
@@ -12,6 +13,16 @@ NOTE:
 HOMO SAPIENS = 9606.
 Human immunodeficiency virus type 1 group M subtype B (isolate HXB2) = 11676.
 Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320.
+
+
+similarities at small scales:
+	SARS-Cov
+	Influenza A
+	HAdV
+similarities at larger scales:
+	HIV1
+	HTLV1
+
 '''
 
 
@@ -62,22 +73,23 @@ BC = pd.read_csv('BetweennessCentrality2.csv', sep=",", skiprows=1)
 
 
 
-#NumberOfViruses = 2 
+NumberOfViruses = 2 
 # list of names of virus data
-NameVirusFile = 'ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt'
-#['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
+#NameVirusFile = 'ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt'
+NameVirusFile = ['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
 # list of names of the file storing the size of the giant component
-FileNamePercolation = 'PercolationCovid.txt'
-#['PercolationHIV.txt','PercolationInfluenzaA.txt']
+#FileNamePercolation = 'PercolationCovid.txt'
+FileNamePercolation = ['PercolationHIV.txt','PercolationInfluenzaA.txt']
 # list of names of final plots
-PlotName = 'PlotCovid.png'
-#['plotHIV.png','plotInfluenzaA.png']
+#PlotName = 'PlotCovid.png'
+PlotName = ['plotHIV.png','plotInfluenzaA.png']
 
 
-
-#for i in range(NumberOfViruses):
-#	IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
-IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile,FileNamePercolation,PlotName)
+#'se si usano più file:'
+for i in range(NumberOfViruses):
+	IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
+#'se si usa un solo file:'
+#IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile,FileNamePercolation,PlotName)
 
 
 
