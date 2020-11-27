@@ -21,8 +21,8 @@ import os
 
 
 
-directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject'
-os.chdir(directory)
+#directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject'
+#os.chdir(directory)
 
 covid=pd.read_excel('2020-03-18_Krogan_SARSCoV2_27baits_LowThreshold.xlsx')
 
@@ -99,7 +99,7 @@ as_other_viruses = pd.DataFrame(data=columns_names2)
 # save dataframe in a file .txt	
 names.to_csv('ProteinNamesString.txt', index=False)
 covid.to_csv('ProteinNamesString_ALLCOLUMNS.txt', index=False)
-as_other_viruses.to_csv('ProteinNamesString_AS_OTHER_VIRUSES.txt', index=False)	
+as_other_viruses.to_csv('ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt', sep='\t', index=False)	
 	
 	
 

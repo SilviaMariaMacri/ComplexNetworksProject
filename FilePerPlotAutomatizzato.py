@@ -51,26 +51,50 @@ GH = Percolation.HumanGraph(sapiens)
 GH_reference = GH.copy(as_view=False)
 
 
-#%%
+
 
 #import BC file as dataframe
 BC = pd.read_csv('BetweennessCentrality2.csv', sep=",", skiprows=1)
  
 	
+#%%
 
 
 
 
-#quanti file dati di virus abbiamo?
-NumberOfViruses = 2 
+#NumberOfViruses = 2 
 # list of names of virus data
-NameVirusFile = ['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
+NameVirusFile = 'ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt'
+#['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
 # list of names of the file storing the size of the giant component
-FileNamePercolation = ['PercolationHIV.txt','PercolationInfluenzaA.txt']
+FileNamePercolation = 'PercolationCovid.txt'
+#['PercolationHIV.txt','PercolationInfluenzaA.txt']
 # list of names of final plots
-PlotName = ['plotHIV.png','plotInfluenzaA.png']
+PlotName = 'PlotCovid.png'
+#['plotHIV.png','plotInfluenzaA.png']
 
 
-for i in range(NumberOfViruses):
-	IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
 
+#for i in range(NumberOfViruses):
+#	IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
+IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile,FileNamePercolation,PlotName)
+
+
+
+
+
+
+
+
+
+#%%
+
+'''
+UNICA PROTEINA UMANA RIPETUTA DUE VOLTE IN 'Preys'
+
+In: covid[covid['Preys']=='Q9Y5L0']
+Out: 
+                Bait   Preys      MIST
+59       SARS-CoV2 M  Q9Y5L0  0.600814
+330  SARS-CoV2 orf7a  Q9Y5L0  0.616847
+'''

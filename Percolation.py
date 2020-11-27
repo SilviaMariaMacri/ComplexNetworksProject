@@ -10,10 +10,9 @@ import seaborn as sns
 
 
 
-
+# create a directed graph of human PPI
 def HumanGraph(sapiens):
 	
-	# create a directed graph of human PPI
 	GH = nx.DiGraph() 
 	for i in range(len(sapiens)):
 		GH.add_edge(sapiens.iloc[i][0], sapiens.iloc[i][1], weight=sapiens.iloc[i][2])
@@ -25,8 +24,8 @@ def HumanGraph(sapiens):
 
 
 
-
-
+# NOT FOR COVID DATA
+# create a directed graph pf virus-human interactions
 def VirusGraph(virus):
 	
 	# select only links with virus protein as starting node and human protein as arrival node 
@@ -41,14 +40,16 @@ def VirusGraph(virus):
 	GV = nx.DiGraph() 
 	for i in range(len(interactionsVH)): 
 		GV.add_edge(interactionsVH[i][0], interactionsVH[i][1], weight=interactionsVH[i][2])
-        
+    
+	print(nx.info(GV))	
+	   
 	return GV
 
 
 
 
 
-
+# NOT FOR COVID DATA
 def HitnodesNonSelectedString(GV):
 	
 	# create an array of human proteins hit by the virus
@@ -56,6 +57,8 @@ def HitnodesNonSelectedString(GV):
 	for i in nx.nodes(GV):
 		if i.startswith('9606.')==True:
 			hitnodes.append(i)
+			
+	print('len(HitnodesNonSelectedString): ', len(hitnodes)	)	
 			
 	return hitnodes
 
@@ -65,14 +68,16 @@ def HitnodesNonSelectedString(GV):
 
 
 
-def NodeDegreeDF(GH,hitnodes):
+def NodeDegreeDF(GH,hitnodes,NameVirusFile):
 	
 	# create an array of human proteins hit by the virus
 	#hitnodes=[]
 	#for i in nx.nodes(GV):
 	#	if i.startswith('9606.')==True:
 	#		hitnodes.append(i)
-			
+		
+
+	
 	# create an array of degree values of human proteins hit by the virus
 	# (the indexing is the same than the array hitnodes)
 	degree=[]
@@ -85,20 +90,26 @@ def NodeDegreeDF(GH,hitnodes):
 	ND = pd.DataFrame(data=columns_nodes_degree)        
 	#len(ND)
 	
-	# create an array with the indexes of nodes corresponding to human proteins that 
-	# are absent in GH because of the initial score-based selection
-	index_absent_node=[]
-	for i in range(len(ND)): 
-		if type(ND['degree'][i])!=int:
-			index_absent_node.append(i)
-	#len(indici)
+	
+	# if virus is not covid, we have to cancel those protein that are present in GV and absent in GH
+	if NameVirusFile != 'ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt':
+		
+		# create an array with the indexes of nodes corresponding to human proteins that 
+		# are absent in GH because of the initial score-based selection
+		index_absent_node=[]
+		for i in range(len(ND)): 
+			if type(ND['degree'][i])!=int:
+				index_absent_node.append(i)
+	
     
     
-	# erase rows of ND that correspond to absent nodes in GH
-	ND = ND.drop(index_absent_node)        
-	# reindex ND 
-	ND.index = np.arange(0,len(ND),1)
-	#len(ND)
+		# erase rows of ND that correspond to absent nodes in GH
+		ND = ND.drop(index_absent_node)        
+		# reindex ND 
+		ND.index = np.arange(0,len(ND),1)
+		#len(ND)
+	
+	print('len(NodeDegreeDF): ',len(ND))
 	
 	
 	return ND
@@ -110,12 +121,14 @@ def NodeDegreeDF(GH,hitnodes):
 
 
 # selection of hitnodes present in GH
-def Hitnodes(GH,hitnodes):
+def Hitnodes(GH,hitnodes,NameVirusFile):
 	
-	ND = NodeDegreeDF(GH,hitnodes)
+	ND = NodeDegreeDF(GH,hitnodes,NameVirusFile)
 
 	# recreate a new array of hit nodes that are all present in GH
 	hitnodes = np.array(ND['nodes'])
+	
+	print('len(Hitnodes): ', len(hitnodes))
 	
 	return hitnodes
 
@@ -149,6 +162,8 @@ def NodeBetweennessDF(GH,BC,hitnodesBC):
 	# reindex BC_sorted 
 	BC_sorted.index = np.arange(0,len(BC_sorted),1)
 	
+	print('len(BC_sorted): ',len(BC_sorted))
+	
 	
 	return BC_sorted
 
@@ -168,6 +183,8 @@ def PercolationRandom(GH,ND):
 	sizeG=[] #create an empty array for the size of the giant component over time
 	sizeG.append(sizeG_single)
 	
+	print('sizeG iniziale (RANDOM): ',sizeG_single)
+	
 	random_index = np.arange(len(ND)) # create an array of indexes for the nodes
 	np.random.shuffle(random_index) # shuffle indexes
         
@@ -177,6 +194,9 @@ def PercolationRandom(GH,ND):
 		# calculate the size of the giant component
 		sizeG_single = len(max(nx.strongly_connected_components(GH)))
 		sizeG.append(sizeG_single) 
+		
+		
+	print('sizeG finale (RANDOM): ',sizeG_single)
     
 	return sizeG
 
@@ -195,7 +215,9 @@ def PercolationDegree(GH,ND,hitnodes):
 	
 	sizeG_single = len(max(nx.strongly_connected_components(GH)))
 	sizeG=[] #create an empty array for the size of the giant component over time
-	sizeG.append(sizeG_single)         
+	sizeG.append(sizeG_single)  
+
+	print('sizeG iniziale (DEGREE): ',sizeG_single)       
 
 	# node of maximum degree 
 	node_to_remove = ND[ND['degree']==max(ND['degree'])]
@@ -218,6 +240,8 @@ def PercolationDegree(GH,ND,hitnodes):
 			for i in range(len(ND)): 
 				ND.iloc[i][1] = nx.degree(GH,ND.iloc[i][0]) 
 			node_to_remove = ND[ND['degree']==max(ND['degree'])]
+			
+	print('sizeG finale (DEGREE): ',sizeG_single)
     
 	
 	return sizeG
@@ -237,6 +261,8 @@ def PercolationBetweenness(GH,BC_sorted):
 	sizeG_single = len(max(nx.strongly_connected_components(GH)))
 	sizeG = [] #create an empty array for the size of the giant component over time
 	sizeG.append(sizeG_single) 
+	
+	print('sizeG iniziale (BC): ',sizeG_single)
 
 
 	for i in range (len(BC_sorted)):
@@ -245,6 +271,9 @@ def PercolationBetweenness(GH,BC_sorted):
 		# calculate the size of the giant component
 		sizeG_single = len(max(nx.strongly_connected_components(GH)))
 		sizeG.append(sizeG_single) 
+		
+		
+	print('sizeG finale (BC): ',sizeG_single)
 		
 		
 	return sizeG
@@ -264,7 +293,7 @@ def PercolationBetweenness(GH,BC_sorted):
 def GraphPercolation(percol,nameplot):
 	sns.set_style('whitegrid')
 	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,6))
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6,5))
 	x_axis = percol['removed_nodes']/percol['removed_nodes'].iloc[len(percol)-1]
 	ax.plot(x_axis, percol['sizeG_random'], label='random', linewidth=0.75)
 	ax.plot(x_axis, percol['sizeG_degree'], label='degree', linewidth=0.75)
@@ -321,11 +350,11 @@ def PercolationCode(GH_reference,ND,hitnodes,BC_sorted,FileNamePercolation,namep
 
 
 	#create file .txt with different values of the size of the giant component obtained by percolation
-	graph_df.to_csv(FileNamePercolation, index=True, index_label = 'removed_nodes') 
+	graph_df.to_csv(FileNamePercolation, sep="\t", index=True, index_label = 'removed_nodes') 
 
 
 	#import file as dataframe
-	percol = pd.read_csv(FileNamePercolation, sep=",")
+	percol = pd.read_csv(FileNamePercolation, sep="\t")
 
 
 	 
