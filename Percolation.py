@@ -65,7 +65,7 @@ def HitnodesNonSelectedString(GV):
 
 
 
-def NodeDegreeDF(GH,GV,hitnodes):
+def NodeDegreeDF(GH,hitnodes):
 	
 	# create an array of human proteins hit by the virus
 	#hitnodes=[]
@@ -110,9 +110,9 @@ def NodeDegreeDF(GH,GV,hitnodes):
 
 
 # selection of hitnodes present in GH
-def Hitnodes(GH,GV,hitnodes):
+def Hitnodes(GH,hitnodes):
 	
-	ND = NodeDegreeDF(GH,GV,hitnodes)
+	ND = NodeDegreeDF(GH,hitnodes)
 
 	# recreate a new array of hit nodes that are all present in GH
 	hitnodes = np.array(ND['nodes'])
@@ -127,9 +127,9 @@ def Hitnodes(GH,GV,hitnodes):
 
 
 
-def NodeBetweennessDF(GH,GV,BC,hitnodes):
+def NodeBetweennessDF(GH,BC,hitnodes):
 	
-	hitnodesBC = Hitnodes(GH,GV,hitnodes)
+	hitnodesBC = Hitnodes(GH,hitnodes)
 	
 	# select only BC values of hit proteins			
 	BCnodes = []
@@ -276,5 +276,68 @@ def GraphPercolation(percol,nameplot):
 	plt.show()
 	
 	return
+
+
+
+
+
+
+
+
+
+
+
+def PercolationCode(GH_reference,ND,hitnodes,BC_sorted,FileNamePercolation,nameplot):	
+	
+	
+	# recreate the original GH graph
+	GH = GH_reference.copy(as_view=False)
+
+	# RANDOM PERCOLATION
+	sizeG_random = PercolationRandom(GH,ND)
+
+	# recreate the original GH graph
+	GH = GH_reference.copy(as_view=False)
+
+	# DEGREE-BASED PERCOLATION
+	sizeG_degree = PercolationDegree(GH,ND,hitnodes)
+
+	# recreate the original GH graph
+	GH = GH_reference.copy(as_view=False)
+
+	#BETWEENNESS CENTRALITY - BASED PERCOLATION
+	sizeG_BC = PercolationBetweenness(GH,BC_sorted)
+
+	
+
+
+
+
+
+
+	# create a dataframe with hit nodes and corresponding betweenness centrality
+	columns_graph = {'sizeG_random': sizeG_random, 'sizeG_degree': sizeG_degree, 'sizeG_BC': sizeG_BC}
+	graph_df = pd.DataFrame(data=columns_graph) 	
+
+
+	#create file .txt with different values of the size of the giant component obtained by percolation
+	graph_df.to_csv(FileNamePercolation, index=True, index_label = 'removed_nodes') 
+
+
+	#import file as dataframe
+	percol = pd.read_csv(FileNamePercolation, sep=",")
+
+
+	 
+
+
+
+	#plot
+	GraphPercolation(percol,nameplot)
+	
+	
+	
+	
+	return 
 
 

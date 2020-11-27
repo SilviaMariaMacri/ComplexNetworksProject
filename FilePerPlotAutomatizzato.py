@@ -53,6 +53,13 @@ GH_reference = GH.copy(as_view=False)
 
 #%%
 
+#import BC file as dataframe
+BC = pd.read_csv('BetweennessCentrality2.csv', sep=",", skiprows=1)
+ 
+	
+
+
+
 
 #quanti file dati di virus abbiamo?
 NumberOfViruses = 2 
@@ -65,5 +72,5 @@ PlotName = ['plotHIV.png','plotInfluenzaA.png']
 
 
 for i in range(NumberOfViruses):
-	IterativePercolation.PercolationCode(GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
+	IterativePercolation.IterativePercolation(BC,GH_reference,NameVirusFile[i],FileNamePercolation[i],PlotName[i])
 
