@@ -46,18 +46,15 @@ method = "get_string_ids"
 
 covid=pd.read_excel('2020-03-18_Krogan_SARSCoV2_27baits.xlsx',usecols=['Preys'])
 
-protein_covid=[]
+old_names=covid['Preys']
 
 
 #mette la colonna delle proteine del file del covid in una lista
 
-for i in range(len(covid)):
-    protein_covid.append(covid.iloc[i][0]) 
-
 params = {
 
   #"identifiers" : "\r".join(["p53", "BRCA1", "cdk2", "Q99835"]), # your protein list
-  "identifiers" : "\r".join(protein_covid), # passo la nostra lista
+  "identifiers" : "\r".join(old_names), # passo la nostra lista
   "species" : 9606, # species NCBI identifier 
     "limit" : 1, # only one (best) identifier per input protein
     "echo_query" : 1, # see your input identifiers in the output
@@ -88,7 +85,9 @@ covid_hitproteins=[]
 for line in results.text.strip().split("\n"):
     l = line.split("\t")
     input_identifier, string_identifier = l[0], l[2]
-    print("Input:", input_identifier, "STRING:", string_identifier, sep="\t")
+    #print("Input:", input_identifier, "STRING:", string_identifier, sep="\t")
    
     
     covid_hitproteins.append(string_identifier)
+
+
