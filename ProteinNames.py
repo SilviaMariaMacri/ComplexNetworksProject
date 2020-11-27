@@ -16,6 +16,21 @@
 
 import requests ## python -m pip install requests
 
+import pandas as pd
+import os
+
+
+
+directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject'
+os.chdir(directory)
+
+covid=pd.read_excel('2020-03-18_Krogan_SARSCoV2_27baits_LowThreshold.xlsx')
+
+old_names=covid['Preys']
+
+
+
+
 string_api_url = "https://string-db.org/api"
 output_format = "tsv-no-header"
 method = "get_string_ids"
@@ -24,9 +39,10 @@ method = "get_string_ids"
 ## Set parameters
 ##
 
+
 params = {
 
-    "identifiers" : "\r".join(hitnodes_covid_array),#["p53", "BRCA1", "cdk2", "Q99835"]), # your protein list
+    "identifiers" : "\r".join(old_names),#["p53", "BRCA1", "cdk2", "Q99835"]), # your protein list
     "species" : 9606, # species NCBI identifier 
     "limit" : 1, # only one (best) identifier per input protein
     "echo_query" : 1, # see your input identifiers in the output
@@ -48,8 +64,6 @@ request_url = "/".join([string_api_url, output_format, method])
 results = requests.post(request_url, data=params)
 
 
-'FIN QUI COPIATO, LE RIGHE SEGUENTI LEGGERMENTE MODIFICATE'
-
 
 ##
 ## Read and parse the results
@@ -65,25 +79,30 @@ for line in results.text.strip().split("\n"):
 	
 	
 	
+# ADDING A NEW COLUMN IN THE DATAFRAME WITH THE NEW NAMES
+covid.insert(2,"Preys_NewName",name_string)
+#covid dataframe contains all the excel file plus the new column
 
 
 
+#save on a dataframe oldname and newname
+columns_names1 = {'identifier': name_identifier, 'string_name': name_string}
+names = pd.DataFrame(data=columns_names1)
 
 
-# save everything on a dataframe
-columns_names = {'identifier': name_identifier, 'string_name': name_string}
-names = pd.DataFrame(data=columns_names)
 
-	
+#save on a dataframe covid data AS ALL THE OTHER VIRUSES
+columns_names2 = {'node1_external_id': covid['Bait'], 'node2_external_id': name_string, 'combined_score':covid['MIST']*1000}
+as_other_viruses = pd.DataFrame(data=columns_names2)
 	
 	
 # save dataframe in a file .txt	
 names.to_csv('ProteinNamesString.txt', index=False)
+covid.to_csv('ProteinNamesString_ALLCOLUMNS.txt', index=False)
+as_other_viruses.to_csv('ProteinNamesString_AS_OTHER_VIRUSES.txt', index=False)	
 	
 	
-	
-	
-	
+
 	
 	
 	
