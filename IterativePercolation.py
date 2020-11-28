@@ -1,7 +1,5 @@
 import os 
 import pandas as pd
-import numpy as np
-
 
 directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/ComplexNetworksProject/ComplexNetworksProject'
 #directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/data'

@@ -61,7 +61,7 @@ GH = Percolation.HumanGraph(sapiens)
 # create a copy of GH to store as a reference     
 GH_reference = GH.copy(as_view=False)
 
-
+#%%
 
 
 #import BC file as dataframe
