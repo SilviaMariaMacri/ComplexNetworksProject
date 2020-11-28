@@ -16,11 +16,11 @@ Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320.
 
 
 similarities at small scales:
-	SARS-Cov
-	Influenza A
+	SARS-Cov*
+	Influenza A*
 	HAdV
 similarities at larger scales:
-	HIV1
+	HIV1*
 	HTLV1
 
 '''
@@ -68,21 +68,21 @@ GH_reference = GH.copy(as_view=False)
 BC = pd.read_csv('BetweennessCentrality2.csv', sep=",", skiprows=1)
  
 	
-#%%
 
 
 
 
-NumberOfViruses = 2 
+
+NumberOfViruses = 4 
 # list of names of virus data
 #NameVirusFile = 'ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt'
-NameVirusFile = ['string_interactions_HIV_piccola.tsv','string_interactions_influenzaA_piccola.tsv']
+NameVirusFile = ['string_interactions_InfluenzaA.tsv','string_interactions_HIV1_553.tsv','string_interactions_SARSCov.tsv','ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt']
 # list of names of the file storing the size of the giant component
 #FileNamePercolation = 'PercolationCovid.txt'
-FileNamePercolation = ['PercolationHIV.txt','PercolationInfluenzaA.txt']
+FileNamePercolation = ['PercolationInfluenzaA.txt','PercolationHIV.txt','PercolationSARSCov.txt','PercolationCovid.txt']
 # list of names of final plots
 #PlotName = 'PlotCovid.png'
-PlotName = ['plotHIV.png','plotInfluenzaA.png']
+PlotName = ['plotInfluenzaA.png','PlotHIV.png','PlotSARSCov.png','PlotCovid.png']
 
 
 #'se si usano più file:'

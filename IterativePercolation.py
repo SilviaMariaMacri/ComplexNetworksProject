@@ -29,12 +29,14 @@ def IterativePercolation(BC,GH_reference,NameVirusFile,FileNamePercolation,namep
                    usecols=['node1_external_id','node2_external_id', 'combined_score'])
 
 
-
+	#covid
 	if NameVirusFile == 'ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt':
 		covid = virus['node2_external_id']
 		covid = covid.drop(59)
-		hitnodes_non_selected = np.array(covid)
-		
+		hitnodes_non_selected = list(covid)
+	
+	# other viruses
+	
 	else:
 		# create a directed graph of virus-human interactions 
 		GV = Percolation.VirusGraph(virus)
