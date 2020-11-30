@@ -242,15 +242,17 @@ def PercolationRandom(GH,ND):
 	first_neighbors = list(first_neighbors)
 	
 	#select neighbors with links with combined_score > 900
-#	first_neighbors_selected = list()
-#	for i in range(len(first_neighbors)):
-#		if GH.edges[(node_to_remove,first_neighbors[i])]['weight'] > 950:
-#			first_neighbors_selected.append(first_neighbors[i])
+	first_neighbors_selected = list()
+	for i in range(len(first_neighbors)):
+		if GH.edges[(node_to_remove,first_neighbors[i])]['weight'] > 900:
+			first_neighbors_selected.append(first_neighbors[i])
+			
+			
+	print('numero di primi vicini: ',len(first_neighbors_selected))
 	
 		
-		
 	
-#	print('quanti primi vicini ci sono: ',len(first_neighbors_selected))
+	
 			
 	GH.remove_node(node_to_remove)
 #	print('numero di nodi rimasti: ',nx.number_of_nodes(GH)) 
@@ -268,12 +270,11 @@ def PercolationRandom(GH,ND):
 		
 
 	#AGGIUNTO SOLO PER QUEST'ULYTIM prova:
-	
-	first_neighbors_selected = first_neighbors.copy()
+#	#first_neighbors_selected = first_neighbors.copy()
 
+	print(NumberOfComponents_single)
 
-
-
+	#19254 è numero di nodi in GH 
 	for i in range(1,19254):
 		
 		print('iterazione' , i+1)
@@ -305,7 +306,8 @@ def PercolationRandom(GH,ND):
 		first_neighbors_selected = list() #lista definitiva che andrò a riempire con tutti i vicini
 		
 		#S = [950,900,850,800,750,700,650,600,550,500,450,400,350,300,250,200,150,100,50]
-		S = [900,800,700,600,500,400,300,200,100,0]
+		#S = [900,800,700,600,500,400,300,200,100,0]
+		S = np.arange(998,-2,-2)
 	   
 		for s in S:
 			
@@ -315,13 +317,13 @@ def PercolationRandom(GH,ND):
 				first_neighbors_single = list(first_neighbors_single)
 			
 				#seleziono in base a score
-#				first_neighbors = list()
-#				for y in range(len(first_neighbors_single)):
-#					if GH.edges[(node_to_remove[k],first_neighbors_single[y])]['weight'] > s:
-#						first_neighbors.append(first_neighbors_single[y])
+				first_neighbors = list()
+				for y in range(len(first_neighbors_single)):
+					if GH.edges[(node_to_remove[k],first_neighbors_single[y])]['weight'] > s:
+						first_neighbors.append(first_neighbors_single[y])
 				
 #aggiunto per l'occasione
-				first_neighbors	= first_neighbors_single.copy()
+#				first_neighbors	= first_neighbors_single.copy()
 							
 				#seleziono in modo che non si ripetano i nodi e che non siano all'interno
 				#di 'first_neighbors_selected' e che non siano in 'node_to_remove'
@@ -335,12 +337,14 @@ def PercolationRandom(GH,ND):
 						if first_neighbors[j] not in node_to_remove:
 							first_neighbors_selected.append(first_neighbors[j])
 							
-#			if len(first_neighbors_selected) != 0:
-#				break
-			break
+			if len(first_neighbors_selected) != 0:
+				break
+			
+			
+		print('numero di primi vicini: ',len(first_neighbors_selected))	
 		
-#		print('quanti primi vicini ci sono: ',len(first_neighbors_selected))	
-
+			
+		
 		if len(first_neighbors_selected) == 0:
 			
 			for z in range(len(node_to_remove)):
@@ -398,7 +402,27 @@ def PercolationRandom(GH,ND):
 	return sizeG,NumberOfComponents,NumberRemovedNodes
 
 
+'''
+SAVE
 
+columns_graph = {'sizeG_random': PRandom}
+graph_df = pd.DataFrame(data=columns_graph) 	
+
+graph_df.to_csv('Percolation_InfluenzaA_sizeG.txt', sep="\t", index=True, index_label = 'removed_nodes') 
+
+
+
+
+
+
+GHRidotta = GH.copy(as_view=False)
+In: nx.info(GH)
+Out: 'Name: \nType: DiGraph\nNumber of nodes: 11649\nNumber of edges: 261246
+      \nAverage in degree:  22.4265\nAverage out degree:  22.4265'
+
+
+
+'''
 
 
 
@@ -493,7 +517,7 @@ def PercolationBetweenness(GH,BC_sorted):
 		
 		
 	return sizeG           
-'''
+
 
 def PercolationBetweenness(GH,BC_sorted):
 	
@@ -672,6 +696,202 @@ def PercolationBetweenness(GH,BC_sorted):
     
 	return sizeG,NumberOfComponents,NumberRemovedNodes
 
+
+'''
+
+
+def PercolationBetweenness(GH,BC_sorted):
+	
+	sizeG_single = len(max(nx.strongly_connected_components(GH), key=len))
+	sizeG=[] #create an empty array for the size of the giant component over time
+	sizeG.append(sizeG_single)
+	
+	NumberOfComponents = []
+	NumberOfComponents_single = [len(c) for c in sorted(nx.strongly_connected_components(GH), key=len, reverse=True)]
+	NumberOfComponents.append(NumberOfComponents_single)
+	
+#	print('sizeG iniziale (RANDOM): ',sizeG_single)
+#	print('numero di componenti iniziale: ',NumberOfComponents_single)
+	
+	random_index = np.arange(len(BC_sorted)) # create an array of indexes for the nodes
+	np.random.shuffle(random_index) # shuffle indexes
+     
+	
+#	print('numero di nodi iniziali: ',nx.number_of_nodes(GH)) 
+	
+	
+	NumberRemovedNodes = []	#per far vedere quanti nodi sono rimossi a ogni iterazione
+	
+	# remove the first node following random_index
+	node_to_remove = BC_sorted.iloc[random_index[0]][0]
+			
+	print('iterazione',1)  
+#	print('nodo colpito: ',node_to_remove)
+
+			
+	#calculate first neighbors of the node before the removal
+	first_neighbors = nx.neighbors(GH,node_to_remove)
+	first_neighbors = list(first_neighbors)
+	
+	#select neighbors with links with combined_score > 900
+	first_neighbors_selected = list()
+	for i in range(len(first_neighbors)):
+		if GH.edges[(node_to_remove,first_neighbors[i])]['weight'] > 900:
+			first_neighbors_selected.append(first_neighbors[i])
+			
+			
+	print('numero di primi vicini: ',len(first_neighbors_selected))
+	
+		
+	
+	
+			
+	GH.remove_node(node_to_remove)
+#	print('numero di nodi rimasti: ',nx.number_of_nodes(GH)) 
+	
+	
+	sizeG_single = len(max(nx.strongly_connected_components(GH), key=len))
+	sizeG.append(sizeG_single)
+	
+	NumberOfComponents_single = [len(c) for c in sorted(nx.strongly_connected_components(GH), key=len, reverse=True)]
+	NumberOfComponents.append(NumberOfComponents_single)
+	
+	
+	
+	NumberRemovedNodes.append(len(node_to_remove))	# quenti nodi sono stati rimossi	
+		
+
+	#AGGIUNTO SOLO PER QUEST'ULYTIM prova:
+#	#first_neighbors_selected = first_neighbors.copy()
+
+	print(NumberOfComponents_single)
+
+	#19254 è numero di nodi in GH 
+	for i in range(1,19254):
+		
+		print('iterazione' , i+1)
+			
+		# nodes to remove are the first neighbors of the removed node and the second directly-hit node
+		
+		#calcolo i nodi in GH
+		present_nodes_in_GH = nx.nodes(GH)
+		present_nodes_in_GH = list(present_nodes_in_GH)
+			
+	
+
+			
+		node_to_remove =  first_neighbors_selected.copy()
+		#hit node
+		if i < len(BC_sorted):
+			NDi = BC_sorted.iloc[random_index[i]][0]
+			if NDi in present_nodes_in_GH: #funziona solo se NDi è in GH
+				if NDi not in node_to_remove: 
+					node_to_remove.append(NDi)
+#		print('nodo colpito: ', NDi)
+#		print('quanti nodi da rimuovere: ',len(node_to_remove))
+		# node_to_remove è lista di nodi da rimuovere prima della prossima iterazione
+		
+		NumberRemovedNodes.append(len(node_to_remove))
+		
+		#calculate first neighbors of the nodes before the removal
+		
+		first_neighbors_selected = list() #lista definitiva che andrò a riempire con tutti i vicini
+		
+		#S = [950,900,850,800,750,700,650,600,550,500,450,400,350,300,250,200,150,100,50]
+		#S = [900,800,700,600,500,400,300,200,100,0]
+		S = np.arange(998,-2,-2)
+	   
+		for s in S:
+			
+			for k in range(len(node_to_remove)): 
+				#calculate first neighbors for each just removed node
+				first_neighbors_single = nx.neighbors(GH,node_to_remove[k]) #vicini a uno dei nodi che verranno rimossi
+				first_neighbors_single = list(first_neighbors_single)
+			
+				#seleziono in base a score
+				first_neighbors = list()
+				for y in range(len(first_neighbors_single)):
+					if GH.edges[(node_to_remove[k],first_neighbors_single[y])]['weight'] > s:
+						first_neighbors.append(first_neighbors_single[y])
+				
+#aggiunto per l'occasione
+#				first_neighbors	= first_neighbors_single.copy()
+							
+				#seleziono in modo che non si ripetano i nodi e che non siano all'interno
+				#di 'first_neighbors_selected' e che non siano in 'node_to_remove'
+				
+				
+				#for each element of the first neighbors...
+				for j in range(len(first_neighbors)): 
+					#append to the list 'first_neighbors_selected' only if the node is 
+					#not already there and not in 'node_to_remove'
+					if first_neighbors[j] not in first_neighbors_selected:
+						if first_neighbors[j] not in node_to_remove:
+							first_neighbors_selected.append(first_neighbors[j])
+							
+			if len(first_neighbors_selected) != 0:
+				break
+			
+			
+		print('numero di primi vicini: ',len(first_neighbors_selected))	
+		
+			
+		
+		if len(first_neighbors_selected) == 0:
+			
+			for z in range(len(node_to_remove)):
+				GH.remove_node(node_to_remove[z])
+			
+				sizeG_single = len(max(nx.strongly_connected_components(GH), key=len))
+				sizeG.append(sizeG_single) 
+		
+				NumberOfComponents_single = [len(c) for c in sorted(nx.strongly_connected_components(GH), key=len, reverse=True)]
+				NumberOfComponents.append(NumberOfComponents_single)
+		
+		
+				NumberRemovedNodes.append(len(node_to_remove))	# quenti nodi sono stati rimossi	
+	
+			break
+
+			
+		#if len(node_to_remove) != 0:
+		for z in range(len(node_to_remove)):
+			GH.remove_node(node_to_remove[z])
+		
+#			print('numero di nodi rimasti: ',nx.number_of_nodes(GH)) 
+	
+		
+			
+		
+		
+		#if n == 0: #se numero di nodi in GH = 0 fermo il ciclo
+		#	sizeG_single = 0
+		#	sizeG.append(sizeG_single)
+		#	break
+		
+		# calculate the size of the giant component
+		
+			if sizeG_single == 0:
+				sizeG.append(sizeG_single)
+				break
+
+		
+			sizeG_single = len(max(nx.strongly_connected_components(GH), key=len))
+			sizeG.append(sizeG_single) 
+		
+			NumberOfComponents_single = [len(c) for c in sorted(nx.strongly_connected_components(GH), key=len, reverse=True)]
+			NumberOfComponents.append(NumberOfComponents_single)
+		
+			print(NumberOfComponents_single)
+		
+		
+		
+#			print('sizeG: ',sizeG_single)
+		
+
+
+    
+	return sizeG,NumberOfComponents,NumberRemovedNodes
 
 
 
