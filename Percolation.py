@@ -242,10 +242,10 @@ def PercolationRandom(GH,ND):
 	first_neighbors = list(first_neighbors)
 	
 	#select neighbors with links with combined_score > 900
-	first_neighbors_selected = list()
-	for i in range(len(first_neighbors)):
-		if GH.edges[(node_to_remove,first_neighbors[i])]['weight'] > 900:
-			first_neighbors_selected.append(first_neighbors[i])
+#	first_neighbors_selected = list()
+#	for i in range(len(first_neighbors)):
+#		if GH.edges[(node_to_remove,first_neighbors[i])]['weight'] > 900:
+#			first_neighbors_selected.append(first_neighbors[i])
 			
 			
 	print('numero di primi vicini: ',len(first_neighbors_selected))
@@ -270,11 +270,11 @@ def PercolationRandom(GH,ND):
 		
 
 	#AGGIUNTO SOLO PER QUEST'ULYTIM prova:
-#	#first_neighbors_selected = first_neighbors.copy()
+	first_neighbors_selected = first_neighbors.copy()
 
 	print(NumberOfComponents_single)
 
-	#19254 è numero di nodi in GH 
+	#19254 è numero di nodi in GH    UN NUMERO COME UN ALTRO
 	for i in range(1,19254):
 		
 		print('iterazione' , i+1)
@@ -290,11 +290,14 @@ def PercolationRandom(GH,ND):
 			
 		node_to_remove =  first_neighbors_selected.copy()
 		#hit node
-		if i < len(ND):
-			NDi = ND.iloc[random_index[i]][0]
+		#if i < len(ND):
+		for a in range(1,len(ND)):	
+			NDi = ND.iloc[random_index[a]][0]
 			if NDi in present_nodes_in_GH: #funziona solo se NDi è in GH
 				if NDi not in node_to_remove: 
 					node_to_remove.append(NDi)
+					break
+				
 #		print('nodo colpito: ', NDi)
 #		print('quanti nodi da rimuovere: ',len(node_to_remove))
 		# node_to_remove è lista di nodi da rimuovere prima della prossima iterazione
@@ -317,13 +320,13 @@ def PercolationRandom(GH,ND):
 				first_neighbors_single = list(first_neighbors_single)
 			
 				#seleziono in base a score
-				first_neighbors = list()
-				for y in range(len(first_neighbors_single)):
-					if GH.edges[(node_to_remove[k],first_neighbors_single[y])]['weight'] > s:
-						first_neighbors.append(first_neighbors_single[y])
+#				first_neighbors = list()
+#				for y in range(len(first_neighbors_single)):
+#					if GH.edges[(node_to_remove[k],first_neighbors_single[y])]['weight'] > s:
+#						first_neighbors.append(first_neighbors_single[y])
 				
 #aggiunto per l'occasione
-#				first_neighbors	= first_neighbors_single.copy()
+				first_neighbors	= first_neighbors_single.copy()
 							
 				#seleziono in modo che non si ripetano i nodi e che non siano all'interno
 				#di 'first_neighbors_selected' e che non siano in 'node_to_remove'
@@ -337,15 +340,16 @@ def PercolationRandom(GH,ND):
 						if first_neighbors[j] not in node_to_remove:
 							first_neighbors_selected.append(first_neighbors[j])
 							
-			if len(first_neighbors_selected) != 0:
-				break
-			
+#			if len(first_neighbors_selected) != 0:
+#				break
+			break
 			
 		print('numero di primi vicini: ',len(first_neighbors_selected))	
 		
 			
 		
-		if len(first_neighbors_selected) == 0:
+		#if len(first_neighbors_selected) == 0:
+		if len(node_to_remove) == 0:
 			
 			for z in range(len(node_to_remove)):
 				GH.remove_node(node_to_remove[z])
@@ -700,7 +704,7 @@ def PercolationBetweenness(GH,BC_sorted):
 '''
 
 
-def PercolationBetweenness(GH,BC_sorted):
+def PercolationBetweenness(GH,BC_sorted,BC):
 	
 	sizeG_single = len(max(nx.strongly_connected_components(GH), key=len))
 	sizeG=[] #create an empty array for the size of the giant component over time
@@ -713,8 +717,7 @@ def PercolationBetweenness(GH,BC_sorted):
 #	print('sizeG iniziale (RANDOM): ',sizeG_single)
 #	print('numero di componenti iniziale: ',NumberOfComponents_single)
 	
-	random_index = np.arange(len(BC_sorted)) # create an array of indexes for the nodes
-	np.random.shuffle(random_index) # shuffle indexes
+	
      
 	
 #	print('numero di nodi iniziali: ',nx.number_of_nodes(GH)) 
@@ -723,7 +726,7 @@ def PercolationBetweenness(GH,BC_sorted):
 	NumberRemovedNodes = []	#per far vedere quanti nodi sono rimossi a ogni iterazione
 	
 	# remove the first node following random_index
-	node_to_remove = BC_sorted.iloc[random_index[0]][0]
+	node_to_remove = BC_sorted.iloc[0][0]
 			
 	print('iterazione',1)  
 #	print('nodo colpito: ',node_to_remove)
@@ -734,14 +737,14 @@ def PercolationBetweenness(GH,BC_sorted):
 	first_neighbors = list(first_neighbors)
 	
 	#select neighbors with links with combined_score > 900
-	first_neighbors_selected = list()
-	for i in range(len(first_neighbors)):
-		if GH.edges[(node_to_remove,first_neighbors[i])]['weight'] > 900:
-			first_neighbors_selected.append(first_neighbors[i])
+#	first_neighbors_selected = list()
+#	for i in range(len(first_neighbors)):
+#		if GH.edges[(node_to_remove,first_neighbors[i])]['weight'] > 900:
+#			first_neighbors_selected.append(first_neighbors[i])
 			
 			
-	print('numero di primi vicini: ',len(first_neighbors_selected))
-	
+#	print('numero di primi vicini: ',len(first_neighbors_selected))
+	print('numero di primi vicini: ',len(first_neighbors))
 		
 	
 	
@@ -762,7 +765,7 @@ def PercolationBetweenness(GH,BC_sorted):
 		
 
 	#AGGIUNTO SOLO PER QUEST'ULYTIM prova:
-#	#first_neighbors_selected = first_neighbors.copy()
+	first_neighbors_selected = first_neighbors.copy()
 
 	print(NumberOfComponents_single)
 
@@ -778,15 +781,18 @@ def PercolationBetweenness(GH,BC_sorted):
 		present_nodes_in_GH = list(present_nodes_in_GH)
 			
 	
-
+	
+			
 			
 		node_to_remove =  first_neighbors_selected.copy()
 		#hit node
-		if i < len(BC_sorted):
-			NDi = BC_sorted.iloc[random_index[i]][0]
+		#if i < len(BC_sorted):
+		for a in range(1,len(BC_sorted)):
+			NDi = BC_sorted.iloc[a][0]
 			if NDi in present_nodes_in_GH: #funziona solo se NDi è in GH
 				if NDi not in node_to_remove: 
 					node_to_remove.append(NDi)
+					break
 #		print('nodo colpito: ', NDi)
 #		print('quanti nodi da rimuovere: ',len(node_to_remove))
 		# node_to_remove è lista di nodi da rimuovere prima della prossima iterazione
@@ -809,13 +815,13 @@ def PercolationBetweenness(GH,BC_sorted):
 				first_neighbors_single = list(first_neighbors_single)
 			
 				#seleziono in base a score
-				first_neighbors = list()
-				for y in range(len(first_neighbors_single)):
-					if GH.edges[(node_to_remove[k],first_neighbors_single[y])]['weight'] > s:
-						first_neighbors.append(first_neighbors_single[y])
+#				first_neighbors = list()
+#				for y in range(len(first_neighbors_single)):
+#					if GH.edges[(node_to_remove[k],first_neighbors_single[y])]['weight'] > s:
+#						first_neighbors.append(first_neighbors_single[y])
 				
 #aggiunto per l'occasione
-#				first_neighbors	= first_neighbors_single.copy()
+				first_neighbors	= first_neighbors_single.copy()
 							
 				#seleziono in modo che non si ripetano i nodi e che non siano all'interno
 				#di 'first_neighbors_selected' e che non siano in 'node_to_remove'
@@ -829,15 +835,16 @@ def PercolationBetweenness(GH,BC_sorted):
 						if first_neighbors[j] not in node_to_remove:
 							first_neighbors_selected.append(first_neighbors[j])
 							
-			if len(first_neighbors_selected) != 0:
-				break
-			
+#			if len(first_neighbors_selected) != 0:
+#				break
+			break
 			
 		print('numero di primi vicini: ',len(first_neighbors_selected))	
 		
 			
 		
-		if len(first_neighbors_selected) == 0:
+#		if len(first_neighbors_selected) == 0:
+		if len(node_to_remove) == 0:
 			
 			for z in range(len(node_to_remove)):
 				GH.remove_node(node_to_remove[z])
@@ -852,11 +859,16 @@ def PercolationBetweenness(GH,BC_sorted):
 				NumberRemovedNodes.append(len(node_to_remove))	# quenti nodi sono stati rimossi	
 	
 			break
+		
+		
+		nodi_ordinati = NodeBetweennessDF(GH,BC,node_to_remove)
 
 			
 		#if len(node_to_remove) != 0:
-		for z in range(len(node_to_remove)):
-			GH.remove_node(node_to_remove[z])
+#		for z in range(len(node_to_remove)):
+#			GH.remove_node(node_to_remove[z])
+		for z in range(len(nodi_ordinati)):
+			GH.remove_node(nodi_ordinati.iloc[z][0])
 		
 #			print('numero di nodi rimasti: ',nx.number_of_nodes(GH)) 
 	
