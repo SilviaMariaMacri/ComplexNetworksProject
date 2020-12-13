@@ -107,7 +107,7 @@ def entropy_canonical(pp):
 				z[i] = 10**(-15)
 		
 		
-		
+		#prova, in realtà funzionerebbe anche come scritto in matlab
 		limit_single = np.empty(n)
 		for i in range(len(z)):
 			if z[i] > 0:
