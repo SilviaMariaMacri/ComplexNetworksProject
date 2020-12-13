@@ -15,6 +15,7 @@ Human immunodeficiency virus type 1 group M subtype B (isolate HXB2) = 11676.
 Influenza A virus (strain A/Puerto Rico/8/1934 H1N1) = 11320.
 
 
+
 similarities at small scales:
 	SARS-Cov*
 	Influenza A*
@@ -54,12 +55,18 @@ sapiens=sapiens[sapiens['combined_score']>400]
 
 
 
-
 # create a directed graph of human PPI
 GH = Percolation.HumanGraph(sapiens)
 
 # create a copy of GH to store as a reference     
 GH_reference = GH.copy(as_view=False)
+
+
+
+'''
+'Name: \nType: Graph\nNumber of nodes: 19254\nNumber of edges: 992598
+\nAverage degree: 103.1056'
+'''
 
 #%%
 

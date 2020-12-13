@@ -10,10 +10,10 @@ import seaborn as sns
 
 
 
-# create a directed graph of human PPI
+# create a undirected graph of human PPI
 def HumanGraph(sapiens):
 	
-	GH = nx.DiGraph() 
+	GH = nx.Graph() 
 	for i in range(len(sapiens)):
 		GH.add_edge(sapiens.iloc[i][0], sapiens.iloc[i][1], weight=sapiens.iloc[i][2])
 		
@@ -181,14 +181,22 @@ def NodeBetweennessDF(GH,BC,hitnodesBC):
 
 # RANDOM PERCOLATION 
  
-'''       
+       
 def PercolationRandom(GH,ND):
 	
-	sizeG_single = len(max(nx.strongly_connected_components(GH)))
+	sizeG_single = len(max(nx.connected_components(GH)))
 	sizeG=[] #create an empty array for the size of the giant component over time
 	sizeG.append(sizeG_single)
 	
-	print('sizeG iniziale (RANDOM): ',sizeG_single)
+	LengthOfComponents = []
+	LengthOfComponents_single = [len(c) for c in sorted(nx.connected_components(GH), key=len, reverse=True)]
+	LengthOfComponents.append(LengthOfComponents_single)
+	
+	numeronodi = []
+	numeronodi_single = nx.number_of_nodes(GH)
+	numeronodi.append(numeronodi_single)
+	
+	#print('sizeG iniziale (RANDOM): ',sizeG_single)
 	
 	random_index = np.arange(len(ND)) # create an array of indexes for the nodes
 	np.random.shuffle(random_index) # shuffle indexes
@@ -197,13 +205,23 @@ def PercolationRandom(GH,ND):
 		# remove nodes following the random order of random_index
 		GH.remove_node(ND.iloc[random_index[i]][0])
 		# calculate the size of the giant component
-		sizeG_single = len(max(nx.strongly_connected_components(GH)))
+		sizeG_single = len(max(nx.connected_components(GH)))
 		sizeG.append(sizeG_single) 
 		
-		
-	print('sizeG finale (RANDOM): ',sizeG_single)
+		LengthOfComponents_single = [len(c) for c in sorted(nx.connected_components(GH), key=len, reverse=True)]
+		LengthOfComponents.append(LengthOfComponents_single)
+
+	
+		numeronodi_single = nx.number_of_nodes(GH)
+		numeronodi.append(numeronodi_single)
+		print(LengthOfComponents_single)
+	#print('sizeG finale (RANDOM): ',sizeG_single)
     
-	return sizeG
+	return sizeG,numeronodi, LengthOfComponents
+
+
+
+
 
 '''
 
@@ -406,7 +424,7 @@ def PercolationRandom(GH,ND):
 	return sizeG,NumberOfComponents,NumberRemovedNodes
 
 
-'''
+
 SAVE
 
 columns_graph = {'sizeG_random': PRandom}
@@ -448,15 +466,28 @@ Out: 'Name: \nType: DiGraph\nNumber of nodes: 11649\nNumber of edges: 261246
 
 
 
+
+
 # DEGREE-BASED PERCOLATION
+
+
 
 def PercolationDegree(GH,ND,hitnodes):
 	
-	sizeG_single = len(max(nx.strongly_connected_components(GH)))
+	sizeG_single = len(max(nx.connected_components(GH)))
 	sizeG=[] #create an empty array for the size of the giant component over time
 	sizeG.append(sizeG_single)  
 
-	print('sizeG iniziale (DEGREE): ',sizeG_single)       
+
+	LengthOfComponents = []
+	LengthOfComponents_single = [len(c) for c in sorted(nx.connected_components(GH), key=len, reverse=True)]
+	LengthOfComponents.append(LengthOfComponents_single)
+	#print('sizeG iniziale (DEGREE): ',sizeG_single)   
+
+	numeronodi = []
+	numeronodi_single = nx.number_of_nodes(GH)
+	numeronodi.append(numeronodi_single)
+    
 
 	# node of maximum degree 
 	node_to_remove = ND[ND['degree']==max(ND['degree'])]
@@ -466,8 +497,19 @@ def PercolationDegree(GH,ND,hitnodes):
 		GH.remove_node(node_to_remove.iloc[0][0]) 
 
 	    # calculate the size of the giant component
-		sizeG_single = len(max(nx.strongly_connected_components(GH)))
+		sizeG_single = len(max(nx.connected_components(GH)))
 		sizeG.append(sizeG_single)
+		
+		
+		LengthOfComponents_single = [len(c) for c in sorted(nx.connected_components(GH), key=len, reverse=True)]
+		LengthOfComponents.append(LengthOfComponents_single)
+		
+
+		numeronodi_single = nx.number_of_nodes(GH)
+		numeronodi.append(numeronodi_single)
+
+		
+		print(LengthOfComponents_single)
     
 	    # erase from ND the row corresponding to the just erased node of GH
 		index_removed_node = ND[ND['nodes']==node_to_remove.iloc[0][0]].index
@@ -480,11 +522,12 @@ def PercolationDegree(GH,ND,hitnodes):
 				ND.iloc[i][1] = nx.degree(GH,ND.iloc[i][0]) 
 			node_to_remove = ND[ND['degree']==max(ND['degree'])]
 			
-	print('sizeG finale (DEGREE): ',sizeG_single)
+			
+		
+	#print('sizeG finale (DEGREE): ',sizeG_single)
     
 	
-	return sizeG
-
+	return sizeG,numeronodi,LengthOfComponents
 
 
 
@@ -499,29 +542,46 @@ def PercolationDegree(GH,ND,hitnodes):
 
 
 #  BETWEENNESS CENTRALITY - BASED PERCOLATION 
-'''
+
 def PercolationBetweenness(GH,BC_sorted):
 	
-	sizeG_single = len(max(nx.strongly_connected_components(GH)))
+	sizeG_single = len(max(nx.connected_components(GH)))
 	sizeG = [] #create an empty array for the size of the giant component over time
 	sizeG.append(sizeG_single) 
 	
-	print('sizeG iniziale (BC): ',sizeG_single)
+	LengthOfComponents = []
+	LengthOfComponents_single = [len(c) for c in sorted(nx.connected_components(GH), key=len, reverse=True)]
+	LengthOfComponents.append(LengthOfComponents_single)
+	
+	numeronodi = []
+	numeronodi_single = nx.number_of_nodes(GH)
+	numeronodi.append(numeronodi_single)
+	
+	#print('sizeG iniziale (BC): ',sizeG_single)
 
 
 	for i in range (len(BC_sorted)):
 		# remove nodes following the descending order of betweenness
 		GH.remove_node(BC_sorted.iloc[i][0])
 		# calculate the size of the giant component
-		sizeG_single = len(max(nx.strongly_connected_components(GH)))
+		sizeG_single = len(max(nx.connected_components(GH)))
 		sizeG.append(sizeG_single) 
 		
 		
-	print('sizeG finale (BC): ',sizeG_single)
+		LengthOfComponents_single = [len(c) for c in sorted(nx.connected_components(GH), key=len, reverse=True)]
+		LengthOfComponents.append(LengthOfComponents_single)
 		
 		
-	return sizeG           
-
+		
+		numeronodi_single = nx.number_of_nodes(GH)
+		numeronodi.append(numeronodi_single)
+		
+		print(LengthOfComponents_single)
+	#print('sizeG finale (BC): ',sizeG_single)
+		
+		
+	return sizeG ,numeronodi ,LengthOfComponents         
+'''
 
 def PercolationBetweenness(GH,BC_sorted):
 	
@@ -701,7 +761,7 @@ def PercolationBetweenness(GH,BC_sorted):
 	return sizeG,NumberOfComponents,NumberRemovedNodes
 
 
-'''
+
 
 
 def PercolationBetweenness(GH,BC_sorted,BC):
@@ -909,7 +969,7 @@ def PercolationBetweenness(GH,BC_sorted,BC):
 
 
 
-
+'''
 
 
 
