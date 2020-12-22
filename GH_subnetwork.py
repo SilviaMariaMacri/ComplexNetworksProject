@@ -16,7 +16,7 @@ import entropy_canonical_solofunzione
 
 
 
-NameVirusFile = ['string_interactions_InfluenzaA.tsv','string_interactions_HIV1_553.tsv','string_interactions_SARSCov.tsv','string_interactions_yellowfever.tsv']
+NameVirusFile = ['string_interactions_InfluenzaA.tsv','string_interactions_HIV1_553.tsv','string_interactions_SARSCov.tsv','string_interactions_yellowfever.tsv','ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt']
 
 
 graphs = []
@@ -76,6 +76,7 @@ for i in range(len(GV)):
 	
 
 
+graph_df.to_csv(FileNamePercolation, sep="\t", index=True, index_label = 'removed_nodes') 
 
 
 
