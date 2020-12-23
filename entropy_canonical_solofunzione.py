@@ -78,7 +78,8 @@ def entropy_canonical_s(pp):
 	element = 0
 	for i in range(len(Ptot)):
 		for j in range (len(Ptot)):
-			element = element + Ptot[i][j]
+			if i<j:
+				element = element + Ptot[i][j]
 	S_0 = -element/n		
 	
 	
@@ -170,8 +171,9 @@ def entropy_canonical_c(pp):
 	Secondo_termine=0
 	for i in range(len(P)):
 		for j in range (len(P)):
-			Primo_termine=Primo_termine+(P[i][j]*math.log(P[i][j]))
-			Secondo_termine=Secondo_termine+((1-P[i][j])*math.log(1-P[i][j]))
+			if i<j:
+				Primo_termine=Primo_termine+(P[i][j]*math.log(P[i][j]))
+				Secondo_termine=Secondo_termine+((1-P[i][j])*math.log(1-P[i][j]))
 	
 	S_0=(-Primo_termine-Secondo_termine)/n
 	
