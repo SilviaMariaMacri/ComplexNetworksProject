@@ -38,9 +38,12 @@ for i in range(len(G)):
 	#BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G[i]),orient='index')
 	#closeness = pd.DataFrame.from_dict(nx.closeness_centrality(G[i]),orient='index')
 	
-#	for j in range(len(degreeIN)):
-#		if degreeIN.index[j].statswith('9606.')==False:
-#			ax.scatter(degreeIN.iloc[j][0],degreeOUT.iloc[j][0],marker='o', linewidths=0.00001, color='orange')
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
+	ax.scatter(degreeIN.iloc[:][0],degreeOUT.iloc[:][0],marker='o', linewidths=0.00001)
+	
+	for j in range(len(degreeIN)):
+		if degreeIN.index[j].startswith('9606.')!=True:
+			ax.scatter(degreeIN.iloc[j][0],degreeOUT.iloc[j][0],marker='o', linewidths=0.00001, color='r')
 	
 			
 			
@@ -49,10 +52,9 @@ for i in range(len(G)):
 	
 	
 	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
+	
 	#ax.scatter(degreeIN.iloc[:][0],BC.iloc[:][0],marker='o', linewidths=0.00001)
 	#ax.scatter(degreeOUT.iloc[:][0],closeness.iloc[:][0],marker='o', linewidths=0.00001)
-	ax.scatter(degreeIN.iloc[:][0],degreeOUT.iloc[:][0],marker='o', linewidths=0.00001)
 	
 	
 	
