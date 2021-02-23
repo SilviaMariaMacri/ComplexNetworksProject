@@ -1,8 +1,50 @@
+#altro metodo per selezionare la subnetwork (l'aktro è sbagliato)
+
+import Percolation 
+
+
+
+
+	
+
+hitnodes_tot = []
+
+for i in range(len(NameVirusFile)):
+	
+	virus = pd.read_csv(NameVirusFile[i], sep="\t", usecols=['node1_external_id','node2_external_id', 'combined_score'])
+	GV = Percolation.HumanGraph(virus) #se la volgiamo indiretta
+	hitnodes_non_selected = Percolation.HitnodesNonSelectedString(GV)	
+	hitnodes = Percolation.Hitnodes(GH,hitnodes_non_selected,NameVirusFile)
+	hitnodes_tot = np.hstack((hitnodes, hitnodes_tot))
+	
+GH_sub = GH.subgraph(hitnodes_tot)
+	
+
+'''
+nx.info(GH_sub)
+Out[10]: 'Name: \nType: Graph\nNumber of nodes: 2239\nNumber of edges: 
+	57183\nAverage degree:  51.0791'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #%%
 
 import os 
 import pandas as pd
 import networkx as nx
+
 
 
 directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/ComplexNetworksProject/ComplexNetworksProject'
@@ -21,8 +63,10 @@ NameVirusFile = ['string_interactions_WNV.tsv','string_interactions_varicella.ts
 
 
 graphs = []
-for i in range(len(NameVirusFile)):
-	
+
+
+
+for i in range(len(NameVirusFile)):	
 	virus = pd.read_csv(NameVirusFile[i], sep="\t", usecols=['node1_external_id','node2_external_id', 'combined_score'])
 	graph_virus = Percolation.HumanGraph(virus)
 	print(nx.info(graph_virus))
@@ -40,6 +84,8 @@ for i in range(len(NameVirusFile)):
 	graphs.append(graph_virus)	
 
 	print(nx.info(graph_virus))
+	
+	
 			
 
 #%%	
@@ -49,6 +95,12 @@ for i in range(1,len(graphs)-1):
 	GH_subnetwork = nx.compose(GH_subnetwork,graphs[i+1])
 	
 	
+'''
+nx.info(GH_subnetwork)
+Out[4]: 'Name: \nType: Graph\nNumber of nodes: 3178\nNumber of edges: 
+	80792\nAverage degree:  50.8446'''
+	
+#%%	
 	
 	
 GV = []
@@ -64,10 +116,7 @@ for i in range(len(NameVirusFile)):
 #GH_subnetwork_directed = GH_subnetwork.to_directed()
 
 
-'''nx.info(GH_subnetwork_directed)
-Out[36]: 'Name: \nType: DiGraph\nNumber of nodes: 1992\nNumber of edges: 
-	85720\nAverage in degree:  43.0321\nAverage out degree:  43.0321'
-'''
+
 #%%
 
 #FileNameAdjacency = ['adjacency_influenzaA_undir.txt','adjacency_HIV1_553_undir.txt','adjacency_SARSCov_undir.txt','adjacency_HTLV-1_undir.txt','adjacency_WNV_undir.txt','adjacency_covid19_undir.txt']
@@ -77,8 +126,8 @@ Out[36]: 'Name: \nType: DiGraph\nNumber of nodes: 1992\nNumber of edges:
 #Sc = []
 Ss = []
 for i in range(len(GV)):
-	Gnew = nx.compose(GV[i],GH_subnetwork_directed)
-	#Gnew = nx.compose(GV[i],GH_subnetwork)
+	#Gnew = nx.compose(GV[i],GH_subnetwork_directed)
+	Gnew = nx.compose(GV[i],GH_subnetwork)
 	#network.append(Gnew)
 	pp = nx.to_pandas_adjacency(Gnew,weight='weight')
 	#pp.to_csv(FileNameAdjacency[i], sep="\t") 
@@ -96,33 +145,21 @@ for i in range(len(GV)):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 #%%  calcolo delle network undirected NON modificate da string
 #con possibilità di togliere proteine virus
 
 
 GV = []
 
-Sc=[]
-#Ss = []
+#Sc=[]
+Ss = []
 for i in range(len(NameVirusFile)):
 	
 	virus = pd.read_csv(NameVirusFile[i], sep="\t", usecols=['node1_external_id','node2_external_id', 'combined_score'])
 	GV_single = Percolation.HumanGraph(virus)
 	print(nx.info(GV_single))
 	
-	#tolgo nodi corrispondenti a proteine virus
+	#tolgo nodi corrispondenti a proteine virus (DA COMMENTARE DI VOLTA IN VOLTA)
 #	for i in range(len(virus)):
 #		if virus.iloc[i,0].startswith('9606.')!=True:
 #			try:
@@ -135,48 +172,62 @@ for i in range(len(NameVirusFile)):
 	
 	GV.append(GV_single)
 	
-	
+
 	pp = nx.to_pandas_adjacency(GV_single,weight='weight')
-	#Ss_single = entropy_canonical_solofunzione.entropy_canonical_s(pp)
-	Sc_single = entropy_canonical_solofunzione.entropy_canonical_c(pp)
+	Ss_single = entropy_canonical_solofunzione.entropy_canonical_s(pp)
 	#Sc_single = entropy_canonical_solofunzione.entropy_canonical_c(pp)
-	#Ss.append(Ss_single)
-	Sc.append(Sc_single)
+	#Sc_single = entropy_canonical_solofunzione.entropy_canonical_c(pp)
+	Ss.append(Ss_single)
+	#Sc.append(Sc_single)
 
 #%%
 
 #salvo entropie in array (l'ordine è quello di NameVirusFile)
-entropy_0_novirus = []
-entropy_r_novirus = []
+entropy_0 = []
+entropy_r = []
 for i in range(len(Ss)):
 	entropy_0_single = Ss[i][0]
-	entropy_0_novirus.append(entropy_0_single)
+	entropy_0.append(entropy_0_single)
 	entropy_r_single = Ss[i][1]
-	entropy_r_novirus.append(entropy_r_single)
+	entropy_r.append(entropy_r_single)
 	
 
 
 #%% calcolo differenze fra entropia finale e iniziale
 
 
-differenze = []
+differenze_0 = []
+differenze_r = []
 for i in range(len(entropy_0)):
-	diff = entropy_0[i] - entropy_0_novirus[i]
-	differenze.append(diff)
-	
+	#diff_0 = entropy_0[i] - entropy_0_novirus[i]
+	#differenze_0.append(diff_0)
+	#diff_r = entropy_r[i] - entropy_r_novirus[i]
+	#differenze_r.append(diff_r)
+	#normalizzate
+	diff_0 = (entropy_0[i] - entropy_0_novirus[i])/entropy_0_novirus[i]
+	differenze_0.append(diff_0)
+	diff_r = (entropy_r[i] - entropy_r_novirus[i])/entropy_r_novirus[i]
+	differenze_r.append(diff_r)	
 	
 #%% grafico
+NomiVirus = ['WNV','Varicella','SARSCov','Parechovirus 2','Mumps','MARV','Lassa','Influenza A','HTLV-1','HPV1a','HIV 1','Hepatitis B','Ebola','Dengue 2','Cytomegalo']
+
 
 import matplotlib.pyplot as plt
 
 
+#nomi = NameVirusFile.copy()
+#nomi = ['string_interactions_WNV.tsv','string_interactions_varicella.tsv','string_interactions_SARSCov.tsv','string_interactions_parechovirus2.tsv','string_interactions_mumps.tsv','string_interactions_MARV.tsv','string_interactions_lassa.tsv','string_interactions_InfluenzaA.tsv','string_interactions_HTLV-1.tsv','string_interactions_HPV1a.tsv','string_interactions_HIV1_553.tsv','string_interactions_hepatitisB.tsv','string_interactions_ebola.tsv','string_interactions_dengue2.tsv','string_interactions_cytomegalo.tsv']
+
+
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6,5))
-ax.plot(NameVirusFile, differenze , marker="o", label='random', linewidth=0.75)
+ax.plot(NomiVirus, differenze_0 , marker="o", label='$\Delta S_0$', linewidth=0.75)
+ax.plot(NomiVirus, differenze_r , marker="o", label='$\Delta S_r$', linewidth=0.75)
 plt.grid(True)
 plt.xticks(rotation=90)
 ax.set_xlabel('virus')
-ax.set_ylabel('differenze di entropia')
-#	ax.legend(ncol=1 ,loc='best', fontsize=14)
+ax.set_ylabel('$\Delta S$')
+ax.legend(ncol=1 ,loc='best', fontsize=14)
 #	plt.savefig(nameplot)
 #	plt.show()
 
@@ -471,3 +522,92 @@ Type: Graph
 Number of nodes: 438
 Number of edges: 0
 Average degree:   0.0000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CONSIDERANDO NETWORK COMUNE
+
+
+SENZA VIRUS:
+entropy_0_novirus: 54.95060112493653
+entropy_r_novirus: 77.69881236343981
+
+CON VIRUS:
+
+silvia 
+entropy_0
+Out[79]: 
+[55.032675796579525,
+ 55.187430762117906,
+ 54.98951335275074,
+ 55.055601950795534,
+ 55.16496144262161,
+ 55.01706434488959,
+ 55.00396709600124,
+ 55.314943837850926,
+ 55.17149507774756,
+ 55.15970673926066,
+ 55.373443767385936,
+ 55.03140125606253,
+ 55.04795659409541,
+ 55.06762014463314,
+ 54.86446338293951,
+ nan]
+
+entropy_r
+Out[80]: 
+[77.72125856133682,
+ 77.82817273013227,
+ 77.67806836442605,
+ 77.79185157313218,
+ 77.89698372805499,
+ 77.74021177658898,
+ 77.74517534351597,
+ 78.02485995760487,
+ 77.86098457785381,
+ 77.8254277203943,
+ 78.1162807119109,
+ 77.7820224012025,
+ 77.76776028816181,
+ 77.76133242117604,
+ 77.53923212448844,
+ 440.11679912425575]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
