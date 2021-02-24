@@ -24,7 +24,7 @@ def FileNames(Prefix, FileType):
 
 
 
-#%%
+#%% virus
 
 G = []
 
@@ -36,6 +36,26 @@ for i in range(len(NameVirusFile)):
 		graph_virus.add_edge(virus.iloc[j][0], virus.iloc[j][1], weight=virus.iloc[j][2])
 	print(nx.info(graph_virus))
 	G.append(graph_virus)
+	
+	
+#%% human
+
+
+G = []
+
+for i in range(len(NameVirusFile)):	
+	virus = pd.read_csv(NameVirusFile[i], sep="\t", usecols=['node1_external_id','node2_external_id', 'combined_score'])
+	
+	graph_virus = nx.DiGraph() 
+	for j in range(len(virus)):
+		if virus.iloc[i,0].startswith('9606.')==True:
+			graph_virus.add_edge(virus.iloc[j][0], virus.iloc[j][1], weight=virus.iloc[j][2])
+	print(nx.info(graph_virus))
+	G.append(graph_virus)
+	
+		
+	
+	
 	
 	
 #%%	
