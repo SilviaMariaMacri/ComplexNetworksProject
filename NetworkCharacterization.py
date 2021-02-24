@@ -1,10 +1,13 @@
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-NameVirusFile = ['string_interactions_WNV.tsv','string_interactions_varicella.tsv','string_interactions_SARSCov.tsv','string_interactions_parechovirus2.tsv','string_interactions_mumps.tsv','string_interactions_MARV.tsv','string_interactions_lassa.tsv','string_interactions_InfluenzaA.tsv','string_interactions_HTLV-1.tsv','string_interactions_HPV1a.tsv','string_interactions_HIV1_553.tsv','string_interactions_hepatitisB.tsv','string_interactions_ebola.tsv','string_interactions_dengue2.tsv','string_interactions_cytomegalo.tsv']#,'ProteinNamesString_AS_OTHER_VIRUSES_TabSep.txt']
-VirusNames=['WNV','Varicella','SARSCov','Parechovirus2','Mumps','MARV','Lassa','InfluenzaA','HTLV-1','HPV1a','HIV1_553','hepatitisB','Ebola','Dengue2','Cytomegalo']
+directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject'
+os.chdir(directory) 
 
+NameVirusFile = ['string_interactions_WNV.tsv','string_interactions_varicella.tsv','string_interactions_SARSCov.tsv','string_interactions_parechovirus2.tsv','string_interactions_mumps.tsv','string_interactions_MARV.tsv','string_interactions_lassa.tsv','string_interactions_InfluenzaA.tsv','string_interactions_HTLV-1.tsv','string_interactions_HPV1a.tsv','string_interactions_HIV1_553.tsv','string_interactions_hepatitisB.tsv','string_interactions_ebola.tsv','string_interactions_dengue2.tsv','string_interactions_cytomegalo.tsv','Covid19.txt']
+VirusNames=['WNV','Varicella','SARSCov','Parechovirus2','Mumps','MARV','Lassa','InfluenzaA','HTLV-1','HPV1a','HIV1_553','HepatitisB','Ebola','Dengue2','Cytomegalo','SARSCov2']
 
 	
 ###FUNZIONE PER DARE I NOMI AI FILE DEI GRAFICI
@@ -16,10 +19,8 @@ def FileNames(Prefix, FileType):
 	return newnames
 	
 	
-##degree
-NamesDegree=FileNames('DegreeIn_DegreeOut_','.png')
-##bc
-NamesBC=FileNames('HistoBC_','.png')
+
+
 
 #%%
 
@@ -35,12 +36,17 @@ for i in range(len(NameVirusFile)):
 	G.append(graph_virus)
 	
 	
-	
 #%%	
-for i in range(len(G)):
-	
-	#DEGREE IN - DEGREE OUT
-	
+#DEGREE IN - DEGREE OUT
+
+#directory dove si salveranno i grafici		
+directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
+os.chdir(directory) 
+
+##nome dei file
+NamesDegree=FileNames('DegreeIn_DegreeOut_','.png')
+
+for i in range(len(G)):	
 	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index')
 	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index')
 	#BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G[i]),orient='index')
@@ -60,15 +66,42 @@ for i in range(len(G)):
 	
 	ax.legend(['human','virus'])
 	
+	
 	plt.savefig(NamesDegree[i])
 	#plt.show()
 	
+#%%
 
-	#BETWEENNESS
-	
-	bc=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i]),orient='index',columns=['BC'])
+#BETWEENNESS
+
+#directory dove si salveranno i grafici		
+directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
+os.chdir(directory) 
+
+##nome dei file
+NamesBC=FileNames('HistoBC_','.png')
+
+for i in range(len(G)):		
+	bc=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i],weight='weight'),orient='index',columns=['BC'])
 	bc.hist()
+	
 	
 	plt.savefig(NamesBC[i])
 
 #%%
+
+#CLUSTERING COEFFICIENT
+
+#directory dove si salveranno i grafici	
+directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
+os.chdir(directory) 
+
+##nome dei file
+NamesCC=FileNames('HistoClusteringCoeff_','.png')
+
+for i in range(len(G)):		
+	cc=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
+	cc.hist()
+	
+	
+	plt.savefig(NamesCC[i])
