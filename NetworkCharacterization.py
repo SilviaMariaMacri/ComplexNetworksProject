@@ -98,10 +98,53 @@ os.chdir(directory)
 
 ##nome dei file
 NamesCC=FileNames('HistoClusteringCoeff_','.png')
+NamesCC_degreeIN=FileNames('ClustCoeff_DegreeIN_','.png')
+NamesCC_degreeOUT=FileNames('ClustCoeff_DegreeOUT_','.png')
+
+
 
 for i in range(len(G)):		
+	#clustering coefficient
 	cc=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
-	cc.hist()
+	
+	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index')
+	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index')
+	
+	#cc.hist() #HISTOGRAM
+	#plt.savefig(NamesCC[i])
 	
 	
-	plt.savefig(NamesCC[i])
+	#CLUSTERING COEFFICIENT VS DEGREE IN
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
+	ax.scatter(degreeIN.iloc[:][0],cc.loc[:,'CC'],marker='o', linewidths=0.00001, label='human')
+	
+	for j in range(len(degreeIN)):
+		if degreeIN.index[j].startswith('9606.')!=True:
+			ax.scatter(degreeIN.iloc[j][0],cc.iloc[j][0],marker='o', linewidths=0.00001, color='r', label='virus')
+
+	ax.set_xlabel('Degree in')
+	ax.set_ylabel('cc')
+	
+	ax.legend(['human','virus'])
+		
+	plt.savefig(NamesCC_degreeIN[i])
+	
+	
+	
+	
+	
+	#CLUSTERING COEFFICIENT VS DEGREE OUT
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
+	ax.scatter(degreeOUT.iloc[:][0],cc.loc[:,'CC'],marker='o', linewidths=0.00001, label='human')
+	
+	for j in range(len(degreeOUT)):
+		if degreeOUT.index[j].startswith('9606.')!=True:
+			ax.scatter(degreeOUT.iloc[j][0],cc.iloc[j][0],marker='o', linewidths=0.00001, color='r', label='virus')
+
+	ax.set_xlabel('Degree out')
+	ax.set_ylabel('cc')
+	
+	ax.legend(['human','virus'])
+		
+	plt.savefig(NamesCC_degreeOUT[i])
+	
