@@ -52,8 +52,7 @@ for i in range(len(G)):
 	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index')
 	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index')
 	
-	
-	
+		
 	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
 	ax.scatter(degreeIN.iloc[:][0],degreeOUT.iloc[:][0],marker='o', linewidths=0.00001, label='human')
 	
@@ -75,20 +74,35 @@ for i in range(len(G)):
 #%%
 
 #BETWEENNESS
-
 #directory dove si salveranno i grafici		
 directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
 os.chdir(directory) 
 
 ##nome dei file
 NamesBC=FileNames('HistoBC_','.png')
+NamesBC_degreeIN=FileNames('BC_DegreeIN_','.png')
 
 for i in range(len(G)):		
 	bc=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i],weight='weight'),orient='index',columns=['BC'])
-	bc.hist()
+#	bc.hist() #HISTOGRAM
+#	plt.savefig(NamesBC[i])
+#	
+	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index')
+	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index')
 	
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
+	ax.scatter(degreeIN.iloc[:][0],bc.loc[:,'BC'],marker='o', linewidths=0.00001, label='human')
 	
-	plt.savefig(NamesBC[i])
+	for j in range(len(degreeIN)):
+		if degreeIN.index[j].startswith('9606.')!=True:
+			ax.scatter(degreeIN.iloc[j][0],bc.iloc[j][0],marker='o', linewidths=0.00001, color='r', label='virus')
+
+	ax.set_xlabel('Degree in')
+	ax.set_ylabel('Betweenness Centrality')
+	
+	ax.legend(['human','virus'])
+		
+	plt.savefig(NamesBC_degreeIN[i])
 
 #%%
 
