@@ -237,7 +237,10 @@ for i in range(len(G)):
 	
 	
 	
-#%%%	
+#%%%	DEGREE IN vs DEGREE OUT
+
+
+
 NamesDegree = FileNames('DegreeINvsOUT_','.png')
 	
 for i in range(len(G)):
@@ -258,7 +261,11 @@ for i in range(len(G)):
 	ax.set_ylabel('Degree OUT')
 
 
-	plt.savefig(NamesDegree[i])	
+	#plt.savefig(NamesDegree[i])	
+	
+	
+	
+#%%	
 #	cmap=plt.cm.BuGn_r),facecolors='none', edgecolors='b')#
 	#ax.hist2d(df['IN'],df['OUT'],bins=50,cmin = 1, cmap=plt.cm.jet)#plt.cm.Reds)
 	
