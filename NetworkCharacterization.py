@@ -2,12 +2,24 @@ import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import seaborn as sns
+import numpy as np
 
-directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject'
+
+directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/ComplexNetworksProject/ComplexNetworksProject'
+#directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject'
 os.chdir(directory) 
 
+#%%
 NameVirusFile = ['string_interactions_WNV.tsv','string_interactions_varicella.tsv','string_interactions_SARSCov.tsv','string_interactions_parechovirus2.tsv','string_interactions_mumps.tsv','string_interactions_MARV.tsv','string_interactions_lassa.tsv','string_interactions_InfluenzaA.tsv','string_interactions_HTLV-1.tsv','string_interactions_HPV1a.tsv','string_interactions_HIV1_553.tsv','string_interactions_hepatitisB.tsv','string_interactions_ebola.tsv','string_interactions_dengue2.tsv','string_interactions_cytomegalo.tsv','Covid19.txt']
 VirusNames=['WNV','Varicella','SARSCov','Parechovirus2','Mumps','MARV','Lassa','InfluenzaA','HTLV-1','HPV1a','HIV1_553','HepatitisB','Ebola','Dengue2','Cytomegalo','SARSCov2']
+
+
+
+
+
+#%%
+
 
 	
 ###FUNZIONE PER DARE I NOMI AI FILE DEI GRAFICI
@@ -24,7 +36,7 @@ def FileNames(Prefix, FileType):
 
 
 
-#%% virus
+#%%  CREO RETI VIRUS
 
 G = []
 
@@ -36,25 +48,54 @@ for i in range(len(NameVirusFile)):
 		graph_virus.add_edge(virus.iloc[j][0], virus.iloc[j][1], weight=virus.iloc[j][2])
 	print(nx.info(graph_virus))
 	G.append(graph_virus)
-	
-	
-#%% human
 
 
-G = []
 
-for i in range(len(NameVirusFile)):	
-	virus = pd.read_csv(NameVirusFile[i], sep="\t", usecols=['node1_external_id','node2_external_id', 'combined_score'])
+
+
+#%% CREO ARRAY DI DATAFRAMES CON INFO CENTRALITY
+
+
+
+centrality = []
+virus = []
+human = []
+
+for i in range(len(G)):
 	
-	graph_virus = nx.DiGraph() 
-	for j in range(len(virus)):
-		if virus.iloc[i,0].startswith('9606.')==True:
-			graph_virus.add_edge(virus.iloc[j][0], virus.iloc[j][1], weight=virus.iloc[j][2])
-	print(nx.info(graph_virus))
-	G.append(graph_virus)
+	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index',columns=['IN'])
+	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index', columns=['OUT'])
+	BC=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i],weight='weight'),orient='index',columns=['BC'])
+	CC=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
+	clos = pd.DataFrame.from_dict(nx.closeness_centrality(G[i]),orient='index',columns=['clos'])
 	
+	df = pd.concat([degreeIN,degreeOUT,BC,CC,clos], axis=1)
+	
+	centrality.append(df)
+	
+	
+	#separa dataframe
+	virus_index = []
+	for j in range(len(df)):
+		if df.index[j].startswith('9606.')==True:
+			virus_index.append(df.index[j])
 		
+	human_index = []
+	for j in range(len(df)):
+		if df.index[j].startswith('9606.')!=True:
+			human_index.append(df.index[j])
+
+
+	df_virus = df.drop(virus_index)	
+	df_human = df.drop(human_index)
 	
+	virus.append(df_virus)
+	human.append(df_human)
+
+
+
+
+
 	
 	
 	
@@ -194,12 +235,50 @@ for i in range(len(G)):
 	
 	
 	
+#%%%	
+NamesDegree = FileNames('DegreeINvsOUT_','.png')
+	
+for i in range(len(G)):
 	
 	
+	#df = centrality[i]#.sort_values('IN')	
+	h = human[i]
+	v = virus[i]
 	
 	
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+	#sns.set_style('whitegrid')
+	ax.set_title(VirusNames[i])
+	ax.scatter(h['IN'],h['OUT'],s=30, alpha=0.5, edgecolors='b')
+	ax.scatter(v['IN'],v['OUT'],s=30, alpha=0.5, edgecolors='r')
+	
+	ax.set_xlabel('Degree IN')
+	ax.set_ylabel('Degree OUT')
+
+
+	plt.savefig(NamesDegree[i])	
+#	cmap=plt.cm.BuGn_r),facecolors='none', edgecolors='b')#
+	#ax.hist2d(df['IN'],df['OUT'],bins=50,cmin = 1, cmap=plt.cm.jet)#plt.cm.Reds)
+	
+	#ax.hexbin(df['IN'],df['OUT'], gridsize=50, cmap=plt.cm.BuGn_r)
+
+	
+
+	#assex = np.arange(1,len(df)+1,1)
+	#ax.plot(assex,df['IN'],label='degree IN')
+	#ax.plot(assex,df['OUT'],label='degree OUT')
+	#ax.scatter(assex,df['BC']/max(df['BC']),label='betweenness',linewidths=0.001,color='r')
+	#ax.plot(assex,df['CC'],label='clustering coeff')
+	#ax.scatter(assex,df['clos'],label='closeness')
 	
 	
+	#ax.scatter(df['IN'],df['BC']/max(df['BC']),linewidths=0.001)
+	
+	#ax.legend(ncol=1 ,loc='best', fontsize=12)
+
+
+	
+
 #%% divido dataframe degree IN e OUT + istogramma degree IN e OUT
 #    + istogramma degree in e out
 
@@ -238,6 +317,8 @@ for i in range(len(G)):
 
 	degreeOUT_virus = degreeOUT.drop(degreeOUT_virus_index)	
 	degreeOUT_human = degreeOUT.drop(degreeOUT_human_index)	
+
+
 
 
 
@@ -302,12 +383,10 @@ for i in range(len(G)):
 
 
 
-
-
-	fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
-	ax2.hist(clos_virus[0],bins=50,alpha=0.5,label='virus')
-	ax2.hist(clos_human[0],bins=50,alpha=0.5,label='human')
-	ax2.legend(ncol=1 ,loc='best', fontsize=12)
+#	fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
+#	ax2.hist(clos_virus[0],bins=50,alpha=0.5,label='virus')
+#	ax2.hist(clos_human[0],bins=50,alpha=0.5,label='human')
+#	ax2.legend(ncol=1 ,loc='best', fontsize=12)
 
 	#fig3, ax3 = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
 	#ax3.scatter(degreeIN.iloc[:][0],eigenvector.iloc[:][0],marker='o', linewidths=0.00001)
@@ -318,9 +397,5 @@ for i in range(len(G)):
 
 
 
+#istogramma ============= rwidth=0.5
 
-
-
-
-
-	
