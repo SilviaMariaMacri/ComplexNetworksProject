@@ -101,136 +101,109 @@ for i in range(len(G)):
 	
 	
 	
-#%%	
-#DEGREE IN - DEGREE OUT
+
+#%% ISTOGRAMMA BETWEENNESS
+
 
 #directory dove si salveranno i grafici		
-directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
-os.chdir(directory) 
-
-##nome dei file
-NamesDegree=FileNames('DegreeIn_DegreeOut_','.png')
-
-for i in range(len(G)):	
-	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index')
-	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index')
-	
-		
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
-	ax.scatter(degreeIN.iloc[:][0],degreeOUT.iloc[:][0],marker='o', linewidths=0.00001, label='human')
-	
-	for j in range(len(degreeIN)):
-		if degreeIN.index[j].startswith('9606.')!=True:
-			ax.scatter(degreeIN.iloc[j][0],degreeOUT.iloc[j][0],marker='o', linewidths=0.00001, color='r', label='virus')
-
-	
-	
-	ax.set_xlabel('Degree in')
-	ax.set_ylabel('Degree out')
-	
-	ax.legend(['human','virus'])
-	
-	
-	plt.savefig(NamesDegree[i])
-	#plt.show()
-	
-#%%
-
-#BETWEENNESS
-#directory dove si salveranno i grafici		
-directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
+directory= '/home/caterina/Scrivania/CN/grafici'
+#directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
 os.chdir(directory) 
 
 ##nome dei file
 NamesBC=FileNames('HistoBC_','.png')
 NamesBC_degreeIN=FileNames('BC_DegreeIN_','.png')
 
-for i in range(len(G)):		
+for i in range(len(G)):
 	bc=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i],weight='weight'),orient='index',columns=['BC'])
-#	bc.hist() #HISTOGRAM
-#	plt.savefig(NamesBC[i])
-#	
-	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index')
-	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index')
+	BCmax=max(bc['BC'])
 	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
-	ax.scatter(degreeIN.iloc[:][0],bc.loc[:,'BC'],marker='o', linewidths=0.00001, label='human')
+	BCvirus=[]#normalized
+	BChuman=[]#normalized
+	for j in range (len(bc)):
+		if bc.index[j].startswith('9606.')==True:
+			BChuman.append(bc.iloc[j][0]/BCmax)
+		else:
+			BCvirus.append(bc.iloc[j][0]/BCmax)
 	
-	for j in range(len(degreeIN)):
-		if degreeIN.index[j].startswith('9606.')!=True:
-			ax.scatter(degreeIN.iloc[j][0],bc.iloc[j][0],marker='o', linewidths=0.00001, color='r', label='virus')
-
-	ax.set_xlabel('Degree in')
-	ax.set_ylabel('Betweenness Centrality')
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+	ax.hist([BChuman,BCvirus], bins=30, log =False) #HISTOGRAM
 	
+	#ax.set_title(f"BC {VirusNames[i]}")
+	ax.set_title(VirusNames[i])
+	ax.set_xlabel('BC/BCmax')
+	ax.set_ylabel('Entries')
 	ax.legend(['human','virus'])
-		
-	plt.savefig(NamesBC_degreeIN[i])
+	#plt.show()
+	plt.savefig(NamesBC[i])
 
-#%%
-
-#CLUSTERING COEFFICIENT
-
+#%% ISTOGRAMMA CLUSTERING COEFFICIENT
+	
+	
 #directory dove si salveranno i grafici	
 directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
 os.chdir(directory) 
 
 ##nome dei file
 NamesCC=FileNames('HistoClusteringCoeff_','.png')
-NamesCC_degreeIN=FileNames('ClustCoeff_DegreeIN_','.png')
-NamesCC_degreeOUT=FileNames('ClustCoeff_DegreeOUT_','.png')
-
-
 
 for i in range(len(G)):		
 	#clustering coefficient
 	cc=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
+	CCmax=max(cc['CC'])
 	
-	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index')
-	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index')
-	
-	#cc.hist() #HISTOGRAM
-	#plt.savefig(NamesCC[i])
-	
-	
-	#CLUSTERING COEFFICIENT VS DEGREE IN
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
-	ax.scatter(degreeIN.iloc[:][0],cc.loc[:,'CC'],marker='o', linewidths=0.00001, label='human')
-	
-	for j in range(len(degreeIN)):
-		if degreeIN.index[j].startswith('9606.')!=True:
-			ax.scatter(degreeIN.iloc[j][0],cc.iloc[j][0],marker='o', linewidths=0.00001, color='r', label='virus')
+	CCvirus=[]#normalized
+	CChuman=[]#normalized
+	for j in range (len(cc)):
+		if cc.index[j].startswith('9606.')==True:
+			CChuman.append(cc.iloc[j][0]/CCmax)
+		else:
+			CCvirus.append(cc.iloc[j][0]/CCmax)
 
-	ax.set_xlabel('Degree in')
-	ax.set_ylabel('cc')
-	
-	ax.legend(['human','virus'])
-		
-	plt.savefig(NamesCC_degreeIN[i])
 	
 	
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+	ax.hist([CChuman,CCvirus], bins=30) #HISTOGRAM
+	
+	ax.set_title(VirusNames[i])
+	ax.set_xlabel('CC/CCmax')
+	ax.set_ylabel('Entries')
+	ax.legend(["human","virus"])
+	plt.savefig(NamesCC[i])
 	
 	
-	
-	#CLUSTERING COEFFICIENT VS DEGREE OUT
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9,7))
-	ax.scatter(degreeOUT.iloc[:][0],cc.loc[:,'CC'],marker='o', linewidths=0.00001, label='human')
-	
-	for j in range(len(degreeOUT)):
-		if degreeOUT.index[j].startswith('9606.')!=True:
-			ax.scatter(degreeOUT.iloc[j][0],cc.iloc[j][0],marker='o', linewidths=0.00001, color='r', label='virus')
 
-	ax.set_xlabel('Degree out')
-	ax.set_ylabel('cc')
-	
-	ax.legend(['human','virus'])
-		
-	plt.savefig(NamesCC_degreeOUT[i])
+#%% ISTOGRAMMA CLOSENESS
 	
 	
+#directory dove si salveranno i grafici	
+directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
+os.chdir(directory) 
+
+NamesC=FileNames('HistoCloseness_','.png')
+
+for i in range(len(G)):		
+	c=pd.DataFrame.from_dict(nx.closeness_centrality(G[i]),orient='index',columns=['C'])
+	Cmax=max(c['C'])
+	
+	Cvirus=[]#normalized
+	Chuman=[]#normalized
+	for j in range (len(c)):
+		if c.index[j].startswith('9606.')==True:
+			Chuman.append(c.iloc[j][0]/Cmax)
+		else:
+			Cvirus.append(c.iloc[j][0]/Cmax)
+
 	
 	
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+	ax.hist([Chuman,Cvirus], bins=30) #HISTOGRAM
 	
+	ax.set_title(VirusNames[i])
+	ax.set_xlabel('C/Cmax')
+	ax.set_ylabel('Entries')
+	ax.legend(["human","virus"])
+	plt.savefig(NamesC[i])
 	
 	
 	
