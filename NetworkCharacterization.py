@@ -56,9 +56,11 @@ for i in range(len(NameVirusFile)):
 #%% CREO ARRAY DI DATAFRAMES CON INFO CENTRALITY
 
 
-
+#array di dataframe misure di centrality
 centrality = []
+#array di dataframe solo indici=proteine virus
 virus = []
+#array di dataframe solo indici=proteine umane
 human = []
 
 for i in range(len(G)):
