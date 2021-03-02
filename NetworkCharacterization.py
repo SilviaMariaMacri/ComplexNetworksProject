@@ -1,3 +1,12 @@
+istogramma degree
+bc,clos in funz degree
+kNN vs K
+
+
+#%%
+
+
+
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -112,13 +121,30 @@ for i in range(len(G)):
 
 #%% algoritmo di clustering
 from networkx.algorithms.community.centrality import girvan_newman	
-from networkx.algorithms.community import asyn_lpa_communities
+#from networkx.algorithms.community import asyn_lpa_communities
 
 #%%
 alg = []
 for i in range(len(G)):
 	print(i+1)
-	alg.append(asyn_lpa_communities(G[i]))
+	alg.append(list(girvan_newman(G[i])))
+
+
+
+
+#%%
+
+
+
+
+for i in range(len(alg)):
+	print('len alg[',i,']: ', len(alg[i]))
+	for j in range(len(alg[i])):
+		print('    len alg[',i,'][',j,']: ', len(alg[i][j]))
+		for k in range(len(alg[i][j])):
+			print('        len alg[',i,'][',j,'][',k,']: ', len(alg[i][j][k]))
+		
+ 
 	
 	
 #%%	
@@ -342,16 +368,16 @@ def media(array):
 	for i in range(len(array)):
 		scartoi = (array[i]-mu)**2
 		scarti.append(scartoi)
-	err = sum(scarti)/len(scarti)
+	err = np.sqrt(sum(scarti)/len(array))
 	
 	return mu,err
 
 #%%
 
-for j in range(len(G)):  #  problema= 6 lassa virus
+for j in range(len(G)):  #  problema: j=6 lassa virus
 	#j=6
 	
-	df = centrality[j].sort_values('IN')
+	df = centrality[j].sort_values('OUT')
 	
 	x = []
 	deg_in = []
@@ -367,18 +393,19 @@ for j in range(len(G)):  #  problema= 6 lassa virus
 	cc_s = []
 	
 	assex = np.arange(1,len(df)+1,1)
-	#num_divisioni = 10
+	#num_divisioni = 15
 	l = 21#int(len(assex)/num_divisioni)
 	num_divisioni = int(len(assex)/l)
 	
 	for i in range(num_divisioni+1):
 		
 		#media e standard deviation
-		mu_x = assex[i*l:(i+1)*l].mean()
-		s_x = assex[i*l:(i+1)*l].std()
+		mu = media(assex[i*l:(i+1)*l])
+		mu_x = mu[0]
+		s_x = mu[1]
 		
 		
-		mu = media(df['IN'].iloc[i*l:(i+1)*l].to_numpy())
+		mu = media(df['OUT'].iloc[i*l:(i+1)*l].to_numpy())
 		mu_deg_in = mu[0]
 		s_deg_in = mu[1]
 		
@@ -392,18 +419,20 @@ for j in range(len(G)):  #  problema= 6 lassa virus
 		
 		
 		c_norm = df['clos']/max(df['clos'])
-		mu_c = c_norm.iloc[i*l:(i+1)*l].to_numpy().mean()
-		s_c = c_norm.iloc[i*l:(i+1)*l].to_numpy().std()
+		mu = media(c_norm.iloc[i*l:(i+1)*l].to_numpy())
+		mu_c = mu[0]
+		s_c = mu[1]
 		
 		cc_norm = df['CC']/max(df['CC'])
-		mu_cc = cc_norm.iloc[i*l:(i+1)*l].to_numpy().mean()
-		s_cc = cc_norm.iloc[i*l:(i+1)*l].to_numpy().std()
+		mu = cc_norm.iloc[i*l:(i+1)*l].to_numpy()
+		mu_cc = mu[0]
+		s_cc = mu[1]
 		
 		
 
 		x.append(mu_x)
 		deg_in.append(mu_deg_in)
-		deg_in_prova.append(mu_deg_in_prova)
+		#deg_in_prova.append(mu_deg_in_prova)
 		#print(deg_in)
 		#print(deg_in_prova)
 		bc.append(mu_bc)
@@ -437,15 +466,19 @@ for j in range(len(G)):  #  problema= 6 lassa virus
 	#ax.scatter(x,bc,color='r',s=30, alpha=0.5, edgecolors='r')
 	#ax.scatter(x,c,color='r',s=30, alpha=0.5, edgecolors='g')
 	
-	ax.plot(x,deg_in,color='b',label='IN')
-	ax.plot(x,bc,color='r',label='BC')
-	ax.plot(x,c,color='g',label='clos')
-	#ax.scatter(x,deg_in,color='b',s=30, alpha=0.5, edgecolors='b')
-	#ax.scatter(x,bc,color='r',s=30, alpha=0.5, edgecolors='r')
-	#ax.scatter(x,c,color='r',s=30, alpha=0.5, edgecolors='g')
-	ax.errorbar(x,deg_in, xerr=deg_in_s, fmt="|")
-	ax.errorbar(x,bc, xerr=bc_s, fmt="|")
-	ax.errorbar(x,c, xerr=c_s, fmt="|")
+	#ax.plot(x,deg_in,color='b',label='IN')
+	#ax.scatter(x,bc,color='r',label='BC')
+	#ax.plot(x,c,color='g',label='clos')
+	#ax.scatter(deg_in,deg_in,color='b',s=30, alpha=0.5, edgecolors='b',label='IN')
+	#ax.scatter(deg_in,bc,color='r',s=30, alpha=0.5, edgecolors='r',label='BC')
+	#ax.scatter(deg_in,c,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
+	#ax.errorbar(deg_in,deg_in, yerr=deg_in_s, fmt="|",color='b')
+	#ax.errorbar(deg_in,bc, yerr=bc_s, fmt="|",color='r')
+	#ax.errorbar(deg_in,c, yerr=c_s, fmt="|",color='g')
+	#ax.scatter(assex,df['BC']/max(df['BC']),color='b',s=30, alpha=0.5, edgecolors='b')
+	
+	ax.scatter(deg_in,cc,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
+	ax.errorbar(deg_in,cc, yerr=cc_s, fmt="|",color='b')
 	
 	
 	ax.set_title(VirusNames[j])
