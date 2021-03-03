@@ -3,6 +3,31 @@ bc,clos in funz degree
 kNN vs K
 
 
+#%% GH con score > 250
+nx.info(GH)
+Out[7]: 'Name: \nType: Graph\nNumber of nodes: 19322\nNumber of edges: 
+	2252881\nAverage degree: 233.1934'
+
+#%%istogramma degree PPI
+
+
+	
+fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+sns.set_style('whitegrid')
+ax.set_title('Human PPI network')
+	
+ax.hist(degree['degree'],bins=100, log =False, histtype='barstacked')
+#ax.legend(['Homo sapiens','Virus'])
+ax.set_ylabel('# Nodes')
+ax.set_xlabel('Degree')
+	#plt.savefig(NamesDegreeHist[i])	
+	
+
+
+
+
+
+
 #%%
 
 
@@ -85,24 +110,29 @@ for i in range(len(G)):
 	
 	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index',columns=['IN'])
 	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index', columns=['OUT'])
+	#degree = pd.DataFrame.from_dict(nx.degree_centrality(G[i]),orient='index', columns=['degree'])
+	
 	BC=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i],weight='weight'),orient='index',columns=['BC'])
-	CC=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
+	#CC=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
 	
 	clos = pd.DataFrame.from_dict(nx.closeness_centrality(G[i]),orient='index',columns=['clos'])
-	neigh_deg_in = pd.DataFrame.from_dict(nx.average_neighbor_degree(G[i],source='in', target='in',weight='weight'),orient='index',columns=['avg IN'])
-	neigh_deg_out = pd.DataFrame.from_dict(nx.average_neighbor_degree(G[i],source='out', target='out',weight='weight'),orient='index',columns=['avg OUT'])
+	#neigh_deg_in = pd.DataFrame.from_dict(nx.average_neighbor_degree(G[i],source='in', target='in',weight='weight'),orient='index',columns=['avg IN'])
+	#neigh_deg_out = pd.DataFrame.from_dict(nx.average_neighbor_degree(G[i],source='out', target='out',weight='weight'),orient='index',columns=['avg OUT'])
 	
 	
-	df = pd.concat([degreeIN,degreeOUT,BC,CC,clos,neigh_deg_in,neigh_deg_out], axis=1)
+	#df = pd.concat([degreeIN,degreeOUT,BC,CC,clos,neigh_deg_in,neigh_deg_out], axis=1)
+	df = pd.concat([degreeIN,degreeOUT,BC,clos], axis=1)
+	
 	
 	centrality.append(df)
-	
 	
 	#separa dataframe
 	virus_index = []
 	for j in range(len(df)):
 		if df.index[j].startswith('9606.')==True:
-			virus_index.append(df.index[j])
+			virus_index.append(df.index[j])	
+
+
 		
 	human_index = []
 	for j in range(len(df)):
@@ -118,41 +148,6 @@ for i in range(len(G)):
 
 
 
-
-#%% algoritmo di clustering
-from networkx.algorithms.community.centrality import girvan_newman	
-#from networkx.algorithms.community import asyn_lpa_communities
-
-#%%
-alg = []
-for i in range(len(G)):
-	print(i+1)
-	alg.append(list(girvan_newman(G[i])))
-
-
-
-
-#%%
-
-
-
-
-for i in range(len(alg)):
-	print('len alg[',i,']: ', len(alg[i]))
-	for j in range(len(alg[i])):
-		print('    len alg[',i,'][',j,']: ', len(alg[i][j]))
-		for k in range(len(alg[i][j])):
-			print('        len alg[',i,'][',j,'][',k,']: ', len(alg[i][j][k]))
-		
- 
-	
-	
-#%%	
-	
-grafico bc, degree, closeness in funz di nodi
-metti a posto programma
-scrivi qualcosa
-per size netowrk vuoi fare istogramma?
 	
 #%%
 
@@ -288,30 +283,26 @@ for i in range(len(G)):
 	
 #%%	  HISTOGRAMMA DEGREE 
 
-NamesDegreeHist = FileNames('DegreeHistLOG_','.png')
+NamesDegreeHist = FileNames('DegreeHistIN_','.png')
 	
 for i in range(len(G)):
 	
 	
-	df = centrality[i]#.sort_values('IN')	
-	#h = human[i]
-	#v = virus[i]
+	h = human[i]
+	v = virus[i]
 	
 	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+	fig, (ax1,ax2) = plt.subplots(nrows=1, ncols=2, figsize=(4,3))
 	sns.set_style('whitegrid')
-	ax.set_title(VirusNames[i])
+	ax1.set_title('         '+VirusNames[i])
 	
-	#ax.hist([h['IN'],h['OUT'],v['IN'],v['OUT']],bins=10, color=['blue','dodgerblue','orangered','orange'], log =True)
-	ax.hist([df['IN'],df['OUT']],bins=30)
+	ax1.hist([h['IN'],v['IN']],bins=30, log =False, histtype='barstacked')
+	ax2.hist([h['OUT'],v['OUT']],bins=30, log =False, histtype='barstacked')
 	
-	#ax.legend(['Human IN', 'Human OUT','Virus IN', 'Virus OUT'])
-	ax.legend(['IN','OUT'])
 	
-	ax.set_xlabel('Degree')
-	ax.set_ylabel('Entries')
-
-
+	ax2.legend(['Homo sapiens','Virus'])
+	ax1.set_ylabel('# Nodes')
+	#ax.set_xlabel('Degree OUT')
 	#plt.savefig(NamesDegreeHist[i])	
 	
 
@@ -372,25 +363,94 @@ def media(array):
 	
 	return mu,err
 
-#%%
+#%%0'''
+'''
+#for j in range(len(G)): 
+	j=0
+	
+	df = centrality[j]
+	
+	deg = []
+	bc = []
+	c = []
+	
+	deg_s = []
+	bc_s = []
+	c_s = []
+	
+	
+	numero_intervalli = 10
+	l = (max(df['IN']) - min(df['IN']))/numero_intervalli
+#%%	
+	#itero per ogni intervallo 
+	for k in range(numero_intervalli):
+#%%		
+		deg_da_mediare = []
+		bc_da_mediare = []
+		c_da_mediare = []
+		for i in range(len(df)):
+			if df['IN'].iloc[i] > k*l:
+				if df['IN'].iloc[i] < (k+1)*l:
+					 deg_da_mediare.append(df['IN'].iloc[i])
+					 bc_da_mediare.append(df['BC'].iloc[i])
+					 c_da_mediare.append(df['clos'].iloc[i])
+#%%			
+		deg_mu = media(deg_da_mediare)
+		deg.append(deg_mu[0])
+		deg_s.append(deg_mu[1])
+		
+		bc_mu = media(bc_da_mediare)
+		bc.append(bc_mu[0])
+		bc_s.append(bc_mu[1])
+		
+		c_mu = media(c_da_mediare)
+		c.append(c_mu[0])
+		c_s.append(c_mu[1])
+			
+			
+	
+		
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+	sns.set_style('whitegrid')
+
+	ax.scatter(deg_in,cc,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
+	ax.errorbar(deg_in,cc, yerr=cc_s, fmt="|",color='b')
+	
+	
+	ax.set_title(VirusNames[j])
+	ax.set_xlabel('Nodes')
+	ax.set_ylabel('Averaged centrality measures')
+	ax.legend(ncol=1 ,loc='best', fontsize=10)
+	
+	
+	'''
+	
+	
+
+
+#%%      centrality in funz di degree oppure di nodi farendo media fra righe dataframe
+#oppure facendo media fra valori degree
+
+NamesDegree = FileNames('BC+CL_vs_degree_','.png')
+
 
 for j in range(len(G)):  #  problema: j=6 lassa virus
 	#j=6
 	
-	df = centrality[j].sort_values('OUT')
+	df = centrality[j].sort_values('IN')
 	
 	x = []
 	deg_in = []
-	deg_in_prova = []
+	#deg_in_prova = []
 	bc = []
 	c = []
-	cc = []
+	#cc = []
 	
 	x_s = []
 	deg_in_s = []
 	bc_s = []
 	c_s = []
-	cc_s = []
+	#cc_s = []
 	
 	assex = np.arange(1,len(df)+1,1)
 	#num_divisioni = 15
@@ -405,7 +465,7 @@ for j in range(len(G)):  #  problema: j=6 lassa virus
 		s_x = mu[1]
 		
 		
-		mu = media(df['OUT'].iloc[i*l:(i+1)*l].to_numpy())
+		mu = media(df['IN'].iloc[i*l:(i+1)*l].to_numpy())
 		mu_deg_in = mu[0]
 		s_deg_in = mu[1]
 		
@@ -423,10 +483,10 @@ for j in range(len(G)):  #  problema: j=6 lassa virus
 		mu_c = mu[0]
 		s_c = mu[1]
 		
-		cc_norm = df['CC']/max(df['CC'])
-		mu = cc_norm.iloc[i*l:(i+1)*l].to_numpy()
-		mu_cc = mu[0]
-		s_cc = mu[1]
+	#	cc_norm = df['CC']/max(df['CC'])
+	#	mu = cc_norm.iloc[i*l:(i+1)*l].to_numpy()
+	#	mu_cc = mu[0]
+	#	s_cc = mu[1]
 		
 		
 
@@ -437,13 +497,13 @@ for j in range(len(G)):  #  problema: j=6 lassa virus
 		#print(deg_in_prova)
 		bc.append(mu_bc)
 		c.append(mu_c)
-		cc.append(mu_cc)
+	#	cc.append(mu_cc)
 		
 		x_s.append(s_x)
 		deg_in_s.append(s_deg_in)
 		bc_s.append(s_bc)
 		c_s.append(s_c)
-		cc_s.append(s_cc)
+	#	cc_s.append(s_cc)
 		
 		
 		
@@ -470,23 +530,23 @@ for j in range(len(G)):  #  problema: j=6 lassa virus
 	#ax.scatter(x,bc,color='r',label='BC')
 	#ax.plot(x,c,color='g',label='clos')
 	#ax.scatter(deg_in,deg_in,color='b',s=30, alpha=0.5, edgecolors='b',label='IN')
-	#ax.scatter(deg_in,bc,color='r',s=30, alpha=0.5, edgecolors='r',label='BC')
-	#ax.scatter(deg_in,c,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
+	ax.scatter(deg_in,bc,color='r',s=30, alpha=0.5, edgecolors='r',label='BC')
+	ax.scatter(deg_in,c,color='r',s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
 	#ax.errorbar(deg_in,deg_in, yerr=deg_in_s, fmt="|",color='b')
-	#ax.errorbar(deg_in,bc, yerr=bc_s, fmt="|",color='r')
-	#ax.errorbar(deg_in,c, yerr=c_s, fmt="|",color='g')
+	ax.errorbar(deg_in,bc, yerr=bc_s, fmt="|",color='r')
+	ax.errorbar(deg_in,c, yerr=c_s, fmt="|",color='g')
 	#ax.scatter(assex,df['BC']/max(df['BC']),color='b',s=30, alpha=0.5, edgecolors='b')
 	
-	ax.scatter(deg_in,cc,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
-	ax.errorbar(deg_in,cc, yerr=cc_s, fmt="|",color='b')
+	#ax.scatter(deg_in,cc,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
+	#ax.errorbar(deg_in,cc, yerr=cc_s, fmt="|",color='b')
 	
 	
 	ax.set_title(VirusNames[j])
-	ax.set_xlabel('Nodes')
+	ax.set_xlabel('Degree IN')
 	ax.set_ylabel('Averaged centrality measures')
 	ax.legend(ncol=1 ,loc='best', fontsize=10)
 	
-	
+	plt.savefig(NamesDegree[j])	
 	
 	
 	
@@ -590,3 +650,39 @@ for i in range(len(G)):
 
 #istogramma ============= rwidth=0.5
 
+#%%
+
+#%% algoritmo di clustering
+from networkx.algorithms.community.centrality import girvan_newman	
+#from networkx.algorithms.community import asyn_lpa_communities
+
+#%%
+alg = []
+for i in range(len(G)):
+	print(i+1)
+	alg.append(list(girvan_newman(G[i])))
+
+
+
+
+#%%
+
+
+
+
+for i in range(len(alg)):
+	print('len alg[',i,']: ', len(alg[i]))
+	for j in range(len(alg[i])):
+		print('    len alg[',i,'][',j,']: ', len(alg[i][j]))
+		for k in range(len(alg[i][j])):
+			print('        len alg[',i,'][',j,'][',k,']: ', len(alg[i][j][k]))
+		
+ 
+	
+	
+#%%	
+	
+grafico bc, degree, closeness in funz di nodi
+metti a posto programma
+scrivi qualcosa
+per size netowrk vuoi fare istogramma?
