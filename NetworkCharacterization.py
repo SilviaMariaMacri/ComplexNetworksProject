@@ -1,31 +1,459 @@
-istogramma degree
-bc,clos in funz degree
-kNN vs K
+import networkx as nx
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as pl
+import seaborn as sns
 
 
-#%% GH con score > 250
-nx.info(GH)
-Out[7]: 'Name: \nType: Graph\nNumber of nodes: 19322\nNumber of edges: 
-	2252881\nAverage degree: 233.1934'
 
-#%%istogramma degree PPI
+'''
+ INPUT:
+ G = directed or undirected network
+
+ OUTPUT:
+ if G undirected: 
+ 	df = dataframe with degree, degree of nearest neighbors, betweenness 
+        centrality and closeness centrality as columns and each row corresponding 
+        to a node of the network	
+ if G directed:
+	df = array of three dataframes as entries: 
+	df[0] = dataframe with In degree, Out degree, In degree of nearest neighbors, 
+            Out degree of nearest neighbors, betweenness centrality and closeness 
+            centrality as columns and each row corresponding to a node 
+    df[1] = dataframe with same columns of df[0] and row corresponding only to 
+            human nodes
+    df[2] = dataframe with same columns of df[0] and row corresponding only to 
+            viral nodes
+'''
+
+
+def NetworkCharacterization(G):
+	
+	if nx.is_directed(G) == False:
+		
+		degree = pd.DataFrame.from_dict(G.degree(weight='weight'))
+		degree.columns=['Nodes','K']
+		
+		#degNN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G, weight='weight'),orient='index',columns=['K_nn'])
+		#degNN = degNN.set_index(np.arange(0,len(degNN),1))
+		
+		#BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G,weight='weight'),orient='index',columns=['BC']) #è già normalizzata
+		#BC = BC.set_index(np.arange(0,len(BC),1))
+		
+		#CL = pd.DataFrame.from_dict(nx.closeness_centrality(G),orient='index',columns=['CL']) #è già normalizzata
+		#CL = CL.set_index(np.arange(0,len(CL),1))
+		
+	
+		#dataframe
+		#df = pd.concat([degree,degNN,BC,CL], axis=1)
+		df = degree.copy()
+		
+		
+	else:
+		
+		degreeIN = pd.DataFrame.from_dict(G.in_degree(weight='weight'))
+		degreeIN.columns=['Nodes','Kin']
+		
+		degreeOUT = pd.DataFrame.from_dict(G.out_degree(G,weight='weight'))
+		degreeOUT.columns=['Nodes','Kout']
+		degreeOUT = degreeOUT['Kout']
+		
+		degNN_IN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='in', target='in',weight='weight'),orient='index',columns=['Kin_nn'])
+		degNN_IN = degNN_IN.set_index(np.arange(0,len(degNN_IN),1))
+		
+		degNN_OUT = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='out', target='out',weight='weight'),orient='index',columns=['Kout_nn'])
+		degNN_OUT = degNN_OUT.set_index(np.arange(0,len(degNN_OUT),1))
+	
+		BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G,weight='weight'),orient='index',columns=['BC'])
+		BC = BC.set_index(np.arange(0,len(BC),1))
+		
+		CL = pd.DataFrame.from_dict(nx.closeness_centrality(G),orient='index',columns=['CL'])
+		CL = CL.set_index(np.arange(0,len(CL),1))
+		
+		
+		
+		df_complete = pd.concat([degreeIN,degreeOUT,degNN_IN,degNN_OUT,BC,CL], axis=1)
+
+
+		#split dataframe in human and viral part
+		virus_index = []
+		for j in range(len(df_complete)):
+			if df_complete['Nodes'].iloc[j].startswith('9606.')==True:
+				virus_index.append(df_complete.index[j])	
+
+
+		
+		human_index = []
+		for j in range(len(df_complete)):
+			if df_complete['Nodes'].iloc[j].startswith('9606.')!=True:
+				human_index.append(df_complete.index[j])
+
+
+		df_virus = df_complete.drop(virus_index)	
+		df_human = df_complete.drop(human_index)
+	
+	
+	
+		#array of dataframes
+		df = [df_complete,df_human,df_virus]
+		
+	return df
+
+
+#%%
+
+#%%	
+NamesBC = FileNames('BC_','.png')
+NamesCL = FileNames('CL_','.png')
+NamesINvsOUT = FileNames('DegreeINvsOUT_','.png')
+NamesDegIN = FileNames('DegreeHistIN_','.png')
+NamesDegOUT = FileNames('DegreeHistOUT_','.png')
+NamesKNN = FileNames('SUB_degNN_deg_','.png')	
+	
+for i in range(len(G)):
+	#PlotBcClvsDegree(G[i],VirusNames[i],21,NamesBC[i],NamesCL[i])
+	#PlotINvsOUT(G[i],VirusNames[i],NamesINvsOUT[i])
+	PlotDegreeHist(Gsub[i],VirusNames[i],NamesDegIN[i],NamesDegOUT[i])
+	#PlotDegreeNNvsDegree(Gsub[i],VirusNames[i],NamesKNN[i])
+	
+
+
+#%%
+
+Gsub = []
+for i in range(len(G)):
+	Gsub_i = GH.subgraph(nx.nodes(G[i]))
+	Gsub.append(Gsub_i)
 
 
 	
-fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-sns.set_style('whitegrid')
-ax.set_title('Human PPI network')
+	#%%
+
+
+
+
+
+
+def PlotDegreeHist(G,title,nomiIN,nomiOUT):
 	
-ax.hist(degree['degree'],bins=100, log =False, histtype='barstacked')
-#ax.legend(['Homo sapiens','Virus'])
-ax.set_ylabel('# Nodes')
-ax.set_xlabel('Degree')
-	#plt.savefig(NamesDegreeHist[i])	
+	
+	centrality = NetworkCharacterization(G)
+	
+
+	if nx.is_directed(G) == False:
+		
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax.set_title(title)
+		ax.hist(centrality['K']/1000,bins=30)
+		ax.set_xlabel('Degree')
+		ax.set_ylabel('# Nodes')
+		
+		
+		
+		plt.show()
+		
+	else:
+		
+		human = centrality[1]
+		virus = centrality[2]
+		
+		fig1, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax1.set_title(title)		
+		ax1.hist([human['Kin'],virus['Kin']],bins=30, histtype='barstacked')
+		ax1.set_xlabel('Degree IN')
+		ax1.set_ylabel('# Nodes')
+		ax1.legend(['Homo sapiens','Virus'])
+		
+		plt.savefig(nomiIN)
+		
+		fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax2.set_title(title)	
+		ax2.hist([human['Kout'],virus['Kout']],bins=30, histtype='barstacked')
+		ax2.set_xlabel('Degree OUT')
+		ax2.set_ylabel('# Nodes')
+		ax2.legend(['Homo sapiens','Virus'])
+		
+		plt.savefig(nomiOUT)
+		
+		plt.show()
+		
+		
+	return
+	
+	
 	
 
 
 
 
+
+
+def PlotDegreeNNvsDegree(G,title,nomi):
+
+	
+	centrality = NetworkCharacterization(G)
+	
+
+	if nx.is_directed(G) == False:
+		
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax.set_title(title)
+		ax.scatter(centrality['K'],centrality['K_nn'],s=20, alpha=0.4, edgecolors='b')
+		ax.set_xlabel('K')
+		ax.set_ylabel('$K_{NN}$')
+		
+		plt.show()
+	
+
+
+	
+	
+		
+	else:
+		
+		human = centrality[1]
+		virus = centrality[2]
+		
+		fig, (ax1,ax2) = plt.subplots(nrows=2, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax1.set_title(title)
+		ax1.scatter(human['Kin'],human['Kin_nn'],s=30, alpha=0.5, edgecolors='b')
+		ax1.scatter(virus['Kin'],virus['Kin_nn'],s=30, alpha=0.5, edgecolors='r')
+	
+		ax2.scatter(human['Kout'],human['Kout_nn'],s=30, alpha=0.5, edgecolors='b')
+		ax2.scatter(virus['Kout'],virus['Kout_nn'],s=30, alpha=0.5, edgecolors='r')
+		ax1.legend(title='$K_{NN,IN}$ vs $K_{IN}$')
+		ax2.legend(title='$K_{NN,OUT}$ vs $K_{OUT}$')
+
+		plt.savefig(nomi)
+		
+		plt.show()
+		
+		
+	return
+	
+	
+	
+	
+	
+
+def PlotINvsOUT(G,title,nomipersalvataggio):
+	
+	centrality = NetworkCharacterization(G)
+	
+
+	if nx.is_directed(G) == False:
+		
+		print('Error')
+		
+	
+	else:
+		
+		human = centrality[1]
+		virus = centrality[2]
+		
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax.set_title(title)
+		ax.scatter(human['Kin'],human['Kout'],s=30, alpha=0.5, edgecolors='b')
+		ax.scatter(virus['Kin'],virus['Kout'],s=30, alpha=0.5, edgecolors='r')
+	
+		ax.set_xlabel('Degree IN')
+		ax.set_ylabel('Degree OUT')
+
+		plt.savefig(nomipersalvataggio)
+		
+		plt.show()
+		
+		
+	return
+	
+	
+	
+
+
+
+
+
+
+
+def Mean(array):
+	
+	mu = sum(array)/len(array)
+	
+	err = []
+	for i in range(len(array)):
+		err_i = (array[i]-mu)**2
+		err.append(err_i)
+	sigma = np.sqrt(sum(err)/len(array))
+	
+	return mu,sigma
+
+	
+
+
+
+
+
+def PlotBcClvsDegree(G,title,n,nomipersalvataggioBC,nomipersalvataggioCL): #n = number of the values to average
+	
+
+	if nx.is_directed(G) == False:
+		
+		centrality = NetworkCharacterization(G)
+		centrality = centrality.sort_values('K')
+		
+		
+		
+		
+		deg = []
+		bc = []
+		c = []
+
+		deg_err = []
+		bc_err = []
+		c_err = []
+
+
+		number_intervals = int(len(centrality)/n)
+	
+		for i in range(number_intervals+1):
+			
+			
+			mu = Mean(centrality['K'].iloc[i*n:(i+1)*n].to_numpy())
+			deg_i = mu[0]
+			deg_err_i = mu[1]
+		
+
+			mu = Mean(centrality['BC'].iloc[i*n:(i+1)*n].to_numpy())
+			bc_i = mu[0]
+			bc_err_i = mu[1]
+		
+
+			mu = Mean(centrality['CL'].iloc[i*n:(i+1)*n].to_numpy())
+			c_i = mu[0]
+			c_err_i = mu[1]
+		
+
+
+
+			deg.append(deg_i)
+			bc.append(bc_i)
+			c.append(c_i)
+
+
+			deg_err.append(deg_err_i)
+			bc_err.append(bc_err_i)
+			c_err.append(c_err_i)
+
+		
+		
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax.scatter(deg_in,bc,s=30, alpha=0.5, edgecolors='r',label='BC',facecolors='r')
+		#ax.scatter(centrality['Kin'],centrality['BC'])
+		ax.errorbar(deg_in,bc, yerr=bc_err, fmt="|",color='r')
+		ax.set_title(title)
+		ax.set_xlabel('Degree')
+		ax.set_ylabel('Averaged Betweenness Centrality')
+		
+		plt.savefig(nomipersalvataggioBC)	
+		
+	
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax.scatter(deg_in,c,s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
+		ax.errorbar(deg_in,c, yerr=c_err, fmt="|",color='g')
+		#ax.scatter(centrality['Kin'],centrality['CL'])
+		ax.set_title(title)
+		ax.set_xlabel('Degree')
+		ax.set_ylabel('Averaged Closeness Centrality')
+		
+		plt.savefig(nomipersalvataggioCL)	
+		
+		plt.show()
+		
+		
+	else:
+		
+		
+
+		
+		centrality1, centrality2, centrality3 = NetworkCharacterization(G)
+		centrality = centrality1.sort_values('Kin')
+		
+		
+		deg_in = []
+		bc = []
+		c = []
+
+		deg_in_err = []
+		bc_err = []
+		c_err = []
+
+
+		number_intervals = int(len(centrality)/n)
+	
+		for i in range(number_intervals+1):
+			
+			
+			mu = Mean(centrality['Kin'].iloc[i*n:(i+1)*n].to_numpy())
+			deg_in_i = mu[0]
+			deg_in_err_i = mu[1]
+		
+
+			mu = Mean(centrality['BC'].iloc[i*n:(i+1)*n].to_numpy())
+			bc_i = mu[0]
+			bc_err_i = mu[1]
+		
+
+			mu = Mean(centrality['CL'].iloc[i*n:(i+1)*n].to_numpy())
+			c_i = mu[0]
+			c_err_i = mu[1]
+		
+
+
+
+			deg_in.append(deg_in_i)
+			bc.append(bc_i)
+			c.append(c_i)
+
+
+			deg_in_err.append(deg_in_err_i)
+			bc_err.append(bc_err_i)
+			c_err.append(c_err_i)
+
+		
+		
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax.scatter(deg_in,bc,s=30, alpha=0.5, edgecolors='r',label='BC',facecolors='r')
+		#ax.scatter(centrality['Kin'],centrality['BC'])
+		ax.errorbar(deg_in,bc, yerr=bc_err, fmt="|",color='r')
+		ax.set_title(title)
+		ax.set_xlabel('Degree IN')
+		ax.set_ylabel('Averaged Betweenness Centrality')
+		
+		plt.savefig(nomipersalvataggioBC)	
+		
+	
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		sns.set_style('whitegrid')
+		ax.scatter(deg_in,c,s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
+		ax.errorbar(deg_in,c, yerr=c_err, fmt="|",color='g')
+		#ax.scatter(centrality['Kin'],centrality['CL'])
+		ax.set_title(title)
+		ax.set_xlabel('Degree IN')
+		ax.set_ylabel('Averaged Closeness Centrality')
+		
+		plt.savefig(nomipersalvataggioCL)	
+		
+		plt.show()
+	
 
 
 #%%
@@ -96,559 +524,18 @@ for i in range(len(NameVirusFile)):
 
 
 
-#%% CREO ARRAY DI DATAFRAMES CON INFO CENTRALITY
 
 
-#array di dataframe misure di centrality
-centrality = []
-#array di dataframe solo indici=proteine virus
-virus = []
-#array di dataframe solo indici=proteine umane
-human = []
-
-for i in range(len(G)):
-	
-	degreeIN = pd.DataFrame.from_dict(nx.in_degree_centrality(G[i]),orient='index',columns=['IN'])
-	degreeOUT = pd.DataFrame.from_dict(nx.out_degree_centrality(G[i]),orient='index', columns=['OUT'])
-	#degree = pd.DataFrame.from_dict(nx.degree_centrality(G[i]),orient='index', columns=['degree'])
-	
-	BC=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i],weight='weight'),orient='index',columns=['BC'])
-	#CC=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
-	
-	clos = pd.DataFrame.from_dict(nx.closeness_centrality(G[i]),orient='index',columns=['clos'])
-	#neigh_deg_in = pd.DataFrame.from_dict(nx.average_neighbor_degree(G[i],source='in', target='in',weight='weight'),orient='index',columns=['avg IN'])
-	#neigh_deg_out = pd.DataFrame.from_dict(nx.average_neighbor_degree(G[i],source='out', target='out',weight='weight'),orient='index',columns=['avg OUT'])
-	
-	
-	#df = pd.concat([degreeIN,degreeOUT,BC,CC,clos,neigh_deg_in,neigh_deg_out], axis=1)
-	df = pd.concat([degreeIN,degreeOUT,BC,clos], axis=1)
-	
-	
-	centrality.append(df)
-	
-	#separa dataframe
-	virus_index = []
-	for j in range(len(df)):
-		if df.index[j].startswith('9606.')==True:
-			virus_index.append(df.index[j])	
-
-
-		
-	human_index = []
-	for j in range(len(df)):
-		if df.index[j].startswith('9606.')!=True:
-			human_index.append(df.index[j])
-
-
-	df_virus = df.drop(virus_index)	
-	df_human = df.drop(human_index)
-	
-	virus.append(df_virus)
-	human.append(df_human)
-
-
-
-	
-#%%
-
-#BETWENNESS HISTOGRAM
-
-NamesBC=FileNames('HistoBC_','.png')
-
-
-for i in range(len(G)):
-	bc=pd.DataFrame.from_dict(nx.betweenness_centrality(G[i],weight='weight'),orient='index',columns=['BC'])
-	
-	BCmax=max(bc['BC'])
-	
-	BCvirus=[]#normalized
-	BChuman=[]#normalized
-	
-	for j in range (len(bc)):
-		if bc.index[j].startswith('9606.')==True:
-			BChuman.append(bc.iloc[j][0]/BCmax)
-		else:
-			BCvirus.append(bc.iloc[j][0]/BCmax)
-	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-	ax.hist([BChuman,BCvirus], bins=30, log =False,color=['dodgerblue','orangered'], histtype='barstacked') #,stacked=False) #HISTOGRAM
-	
-	#ax.set_title(f"BC {VirusNames[i]}")
-	ax.set_title(VirusNames[i])
-	ax.set_xlabel('BC/BCmax',labelpad=2)
-	#ax.set_ylabel('Entries')
-	ax.legend(['human','virus'])
-	plt.grid(True)
-	#plt.show()
-	
-	plt.savefig(NamesBC[i])
-
-
-#%% CLOSENESS HISTOGRAM
-NamesC=FileNames('HistoCloseness_','.png')
-
-for i in range(len(G)):		
-	c=pd.DataFrame.from_dict(nx.closeness_centrality(G[i]),orient='index',columns=['C'])
-	Cmax=max(c['C'])
-	
-	Cvirus=[]#normalized
-	Chuman=[]#normalized
-	for j in range (len(c)):
-		if c.index[j].startswith('9606.')==True:
-			Chuman.append(c.iloc[j][0]/Cmax)
-		else:
-			Cvirus.append(c.iloc[j][0]/Cmax)
-
-	
-	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-	ax.hist([Chuman,Cvirus], bins=30, log =False,color=['dodgerblue','orangered'], histtype='barstacked') #HISTOGRAM
-	
-	ax.set_title(VirusNames[i])
-	ax.set_xlabel('C/Cmax',labelpad=2)
-	#ax.set_ylabel('Entries')
-	ax.legend(["human","virus"])
-	plt.grid(True)
-	plt.savefig(NamesC[i])
-#%% ISTOGRAMMA CLUSTERING COEFFICIENT
-	
-	
-#directory dove si salveranno i grafici	
-directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/grafici'
-os.chdir(directory) 
-
-##nome dei file
-NamesCC=FileNames('HistoClusteringCoeff_','.png')
-
-for i in range(len(G)):		
-	#clustering coefficient
-	cc=pd.DataFrame.from_dict(nx.clustering(G[i],weight='weight'),orient='index',columns=['CC'])
-	CCmax=max(cc['CC'])
-	
-	CCvirus=[]#normalized
-	CChuman=[]#normalized
-	for j in range (len(cc)):
-		if cc.index[j].startswith('9606.')==True:
-			CChuman.append(cc.iloc[j][0]/CCmax)
-		else:
-			CCvirus.append(cc.iloc[j][0]/CCmax)
-
-	
-	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-	ax.hist([CChuman,CCvirus], bins=30) #HISTOGRAM
-	
-	ax.set_title(VirusNames[i])
-	ax.set_xlabel('CC/CCmax')
-	ax.set_ylabel('Entries')
-	ax.legend(["human","virus"])
-	plt.savefig(NamesCC[i])
-	
-	
-	
-	
-
-
-
-
-	
-	
-#%%%	DEGREE IN vs DEGREE OUT
-
-
-
-NamesDegree = FileNames('DegreeINvsOUT_','.png')
-	
-for i in range(len(G)):
-	
-	
-	#df = centrality[i]#.sort_values('IN')	
-	h = human[i]
-	v = virus[i]
-	
-	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-	#sns.set_style('whitegrid')
-	ax.set_title(VirusNames[i])
-	ax.scatter(h['IN'],h['OUT'],s=30, alpha=0.5, edgecolors='b')
-	ax.scatter(v['IN'],v['OUT'],s=30, alpha=0.5, edgecolors='r')
-	
-	ax.set_xlabel('Degree IN')
-	ax.set_ylabel('Degree OUT')
-
-
-	#plt.savefig(NamesDegree[i])	
-	
-	
-	
-#%%	  HISTOGRAMMA DEGREE 
-
-NamesDegreeHist = FileNames('DegreeHistIN_','.png')
-	
-for i in range(len(G)):
-	
-	
-	h = human[i]
-	v = virus[i]
-	
-	
-	fig, (ax1,ax2) = plt.subplots(nrows=1, ncols=2, figsize=(4,3))
-	sns.set_style('whitegrid')
-	ax1.set_title('         '+VirusNames[i])
-	
-	ax1.hist([h['IN'],v['IN']],bins=30, log =False, histtype='barstacked')
-	ax2.hist([h['OUT'],v['OUT']],bins=30, log =False, histtype='barstacked')
-	
-	
-	ax2.legend(['Homo sapiens','Virus'])
-	ax1.set_ylabel('# Nodes')
-	#ax.set_xlabel('Degree OUT')
-	#plt.savefig(NamesDegreeHist[i])	
-	
-
-
-
-
-#%%       degree neighbours vs degree
-
-
-
-NamesDegree = FileNames('degNN_deg_','.png')
-	
-for i in range(len(G)):
 	
-	
-	#df = centrality[i]#.sort_values('IN')	
-	h = human[i]
-	v = virus[i]
-	
-	
-	fig, (ax1,ax2) = plt.subplots(nrows=2, ncols=1, figsize=(4,3))
-	sns.set_style('whitegrid')
-	ax1.set_title(VirusNames[i])
-	ax1.scatter(h['IN'],h['avg IN'],s=30, alpha=0.5, edgecolors='b')
-	ax1.scatter(v['IN'],v['avg IN'],s=30, alpha=0.5, edgecolors='r')
-	
-	ax2.scatter(h['OUT'],h['avg OUT'],s=30, alpha=0.5, edgecolors='b')
-	ax2.scatter(v['OUT'],v['avg OUT'],s=30, alpha=0.5, edgecolors='r')
-	#ax.hist([],bins=30)
-	ax1.legend(title='$K_{IN}$ vs $K_{NN,IN}$')
-	ax2.legend(title='$K_{OUT}$ vs $K_{NN,OUT}$')
-	
-	#ax1.set_xlabel('$K_{IN}$')
-	#ax1.set_ylabel('$K_{NN,IN}$')
-	
-	#ax2.set_xlabel('$K_{OUT}$')
-	#ax2.set_ylabel('$K_{NN,OUT}$')
-
-
-	plt.savefig(NamesDegree[i])	
-	
-
-
-
-
-#%%  centrality mediate
-
-
-def media(array):
-	
-	mu = sum(array)/len(array)
-	
-	scarti = []
-	for i in range(len(array)):
-		scartoi = (array[i]-mu)**2
-		scarti.append(scartoi)
-	err = np.sqrt(sum(scarti)/len(array))
-	
-	return mu,err
-
-#%%0'''
-'''
-#for j in range(len(G)): 
-	j=0
-	
-	df = centrality[j]
-	
-	deg = []
-	bc = []
-	c = []
-	
-	deg_s = []
-	bc_s = []
-	c_s = []
-	
-	
-	numero_intervalli = 10
-	l = (max(df['IN']) - min(df['IN']))/numero_intervalli
-#%%	
-	#itero per ogni intervallo 
-	for k in range(numero_intervalli):
-#%%		
-		deg_da_mediare = []
-		bc_da_mediare = []
-		c_da_mediare = []
-		for i in range(len(df)):
-			if df['IN'].iloc[i] > k*l:
-				if df['IN'].iloc[i] < (k+1)*l:
-					 deg_da_mediare.append(df['IN'].iloc[i])
-					 bc_da_mediare.append(df['BC'].iloc[i])
-					 c_da_mediare.append(df['clos'].iloc[i])
-#%%			
-		deg_mu = media(deg_da_mediare)
-		deg.append(deg_mu[0])
-		deg_s.append(deg_mu[1])
-		
-		bc_mu = media(bc_da_mediare)
-		bc.append(bc_mu[0])
-		bc_s.append(bc_mu[1])
-		
-		c_mu = media(c_da_mediare)
-		c.append(c_mu[0])
-		c_s.append(c_mu[1])
-			
-			
-	
-		
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-	sns.set_style('whitegrid')
-
-	ax.scatter(deg_in,cc,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
-	ax.errorbar(deg_in,cc, yerr=cc_s, fmt="|",color='b')
-	
-	
-	ax.set_title(VirusNames[j])
-	ax.set_xlabel('Nodes')
-	ax.set_ylabel('Averaged centrality measures')
-	ax.legend(ncol=1 ,loc='best', fontsize=10)
-	
-	
-	'''
-	
-	
-
-
-#%%      centrality in funz di degree oppure di nodi farendo media fra righe dataframe
-#oppure facendo media fra valori degree
-
-NamesDegree = FileNames('BC+CL_vs_degree_','.png')
-
-
-for j in range(len(G)):  #  problema: j=6 lassa virus
-	#j=6
-	
-	df = centrality[j].sort_values('IN')
-	
-	x = []
-	deg_in = []
-	#deg_in_prova = []
-	bc = []
-	c = []
-	#cc = []
-	
-	x_s = []
-	deg_in_s = []
-	bc_s = []
-	c_s = []
-	#cc_s = []
-	
-	assex = np.arange(1,len(df)+1,1)
-	#num_divisioni = 15
-	l = 21#int(len(assex)/num_divisioni)
-	num_divisioni = int(len(assex)/l)
-	
-	for i in range(num_divisioni+1):
-		
-		#media e standard deviation
-		mu = media(assex[i*l:(i+1)*l])
-		mu_x = mu[0]
-		s_x = mu[1]
-		
-		
-		mu = media(df['IN'].iloc[i*l:(i+1)*l].to_numpy())
-		mu_deg_in = mu[0]
-		s_deg_in = mu[1]
-		
-		#mu_deg_in_prova = sum(df['IN'].iloc[i*l:(i+1)*l])/l
-
-		
-		bc_norm = df['BC']/max(df['BC'])
-		mu = media(bc_norm.iloc[i*l:(i+1)*l].to_numpy())
-		mu_bc = mu[0]
-		s_bc = mu[1]
-		
-		
-		c_norm = df['clos']/max(df['clos'])
-		mu = media(c_norm.iloc[i*l:(i+1)*l].to_numpy())
-		mu_c = mu[0]
-		s_c = mu[1]
-		
-	#	cc_norm = df['CC']/max(df['CC'])
-	#	mu = cc_norm.iloc[i*l:(i+1)*l].to_numpy()
-	#	mu_cc = mu[0]
-	#	s_cc = mu[1]
-		
-		
 
-		x.append(mu_x)
-		deg_in.append(mu_deg_in)
-		#deg_in_prova.append(mu_deg_in_prova)
-		#print(deg_in)
-		#print(deg_in_prova)
-		bc.append(mu_bc)
-		c.append(mu_c)
-	#	cc.append(mu_cc)
-		
-		x_s.append(s_x)
-		deg_in_s.append(s_deg_in)
-		bc_s.append(s_bc)
-		c_s.append(s_c)
-	#	cc_s.append(s_cc)
-		
-		
-		
-		
-		
-	
-		
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-	sns.set_style('whitegrid')
-
-	
-	#ax.plot(deg_in,cc)
-
-
-	#ax.plot(x,deg_in,color='b',label='IN')
-	#ax.plot(x,bc,color='r',label='BC')
-	#ax.plot(x,c,color='g',label='clos')
-	#ax.plot(x,cc,label='CC')
-	#ax.scatter(x,deg_in,color='b',s=30, alpha=0.5, edgecolors='b')
-	#ax.scatter(x,bc,color='r',s=30, alpha=0.5, edgecolors='r')
-	#ax.scatter(x,c,color='r',s=30, alpha=0.5, edgecolors='g')
-	
-	#ax.plot(x,deg_in,color='b',label='IN')
-	#ax.scatter(x,bc,color='r',label='BC')
-	#ax.plot(x,c,color='g',label='clos')
-	#ax.scatter(deg_in,deg_in,color='b',s=30, alpha=0.5, edgecolors='b',label='IN')
-	ax.scatter(deg_in,bc,color='r',s=30, alpha=0.5, edgecolors='r',label='BC')
-	ax.scatter(deg_in,c,color='r',s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
-	#ax.errorbar(deg_in,deg_in, yerr=deg_in_s, fmt="|",color='b')
-	ax.errorbar(deg_in,bc, yerr=bc_s, fmt="|",color='r')
-	ax.errorbar(deg_in,c, yerr=c_s, fmt="|",color='g')
-	#ax.scatter(assex,df['BC']/max(df['BC']),color='b',s=30, alpha=0.5, edgecolors='b')
-	
-	#ax.scatter(deg_in,cc,color='r',s=30, alpha=0.5, edgecolors='g',label='clos',facecolors='g')
-	#ax.errorbar(deg_in,cc, yerr=cc_s, fmt="|",color='b')
-	
-	
-	ax.set_title(VirusNames[j])
-	ax.set_xlabel('Degree IN')
-	ax.set_ylabel('Averaged centrality measures')
-	ax.legend(ncol=1 ,loc='best', fontsize=10)
-	
-	plt.savefig(NamesDegree[j])	
-	
-	
-	
-	
-#%%	
-	
-	
-	#asse x
-	assex = np.arange(1,len(df)+1,1)
-	x=[]			
-	l_x = len(assex)/5
-	l_bc = (max(df['BC'])-min(df['BC']))/(max(df['BC'])*5)
-
-	bc=[]
-	
-	for i in range(5):
-		x_single=[]
-		bc_single=[]
-		for j in range(len(df)):
-			if assex[j] < (i+1)*l_x:
-				if assex[j] > i*l_x:
-					x_single.append(assex[j])
-		x.append(sum(x_single)/len(x_single))
-		for j in range(len(df)):
-			if df['BC'][j] < (i+1)*l_bc:
-				if df['BC'][j] > i*l_bc:
-					bc_single.append(df['BC'][j])
-		bc.append(sum(bc_single)/len(bc_single))
-	
-	
-df.to_numpy().mean()
-std()
-describe()
-
-		
-						
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
-	sns.set_style('whitegrid')
-	
-	ax.plot(x,bc)
-	
-		
-	#ax.scatter(assex,df['BC']/max(df['BC']),s=30, alpha=0.5, edgecolors='b')
-	#ax.scatter(assex,df['clos']/max(df['clos']),s=30, alpha=0.5, edgecolors='r')
-	#ax.scatter(assex,df['IN'],s=30, alpha=0.5, edgecolors='b')
-	#ax.scatter(assex,df['OUT'],s=30, alpha=0.5, edgecolors='g')
-	
-
-
-	
-
-#%%
-#	cmap=plt.cm.BuGn_r),,s=30, alpha=0.5, edgecolors='b'facecolors='none', edgecolors='b')#
-	#ax.hist2d(df['IN'],df['OUT'],bins=50,cmin = 1, cmap=plt.cm.jet)#plt.cm.Reds)
-	
-	#ax.hexbin(df['IN'],df['OUT'], gridsize=50, cmap=plt.cm.BuGn_r)
-
-	
-
-	#assex = np.arange(1,len(df)+1,1)
-	#ax.plot(assex,df['IN'],label='degree IN')
-	#ax.plot(assex,df['OUT'],label='degree OUT')
-	#ax.scatter(assex,df['BC']/max(df['BC']),label='betweenness',linewidths=0.001,color='r')
-	#ax.plot(assex,df['CC'],label='clustering coeff')
-	#ax.scatter(assex,df['clos'],label='closeness')
-	
-	
-	#ax.scatter(df['IN'],df['BC']/max(df['BC']),linewidths=0.001)
-	
-	#ax.legend(ncol=1 ,loc='best', fontsize=12)
 
 
-	
-
-#%% divido dataframe degree IN e OUT + istogramma degree IN e OUT
-#    + istogramma degree in e out
-	
 
 
 
-for i in range(len(G)):
 	
-	df = centrality[i].sort_values('IN')
 	
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
 	
-	#ax.scatter(df['IN'],df['BC'],s=30, alpha=0.5, edgecolors='b')
-	#ax.scatter(df['IN'],df['clos'],s=30, alpha=0.5, edgecolors='r')
-	
-	#ax.scatter(df['OUT'],df['BC'],s=30, alpha=0.5, edgecolors='b')
-	#ax.scatter(df['OUT'],df['clos'],s=30, alpha=0.5, edgecolors='r')
-	
-	assex = np.arange(1,len(df)+1,1)
-	ax.scatter(assex,df['BC']/max(df['BC']),s=30, alpha=0.5, edgecolors='b')
-	ax.scatter(assex,df['clos']/max(df['clos']),s=30, alpha=0.5, edgecolors='r')
-	#ax.scatter(assex,df['IN'],s=30, alpha=0.5, edgecolors='b')
-	ax.scatter(assex,df['OUT'],s=30, alpha=0.5, edgecolors='g')
-	
-	
-
-
-#istogramma ============= rwidth=0.5
 
 #%%
 
