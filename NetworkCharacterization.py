@@ -34,19 +34,20 @@ def NetworkCharacterization(G):
 		degree = pd.DataFrame.from_dict(G.degree(weight='weight'))
 		degree.columns=['Nodes','K']
 		
-		#degNN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G, weight='weight'),orient='index',columns=['K_nn'])
-		#degNN = degNN.set_index(np.arange(0,len(degNN),1))
+		degNN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G, weight='weight'),orient='index',columns=['K_nn'])
+		degNN = degNN.set_index(np.arange(0,len(degNN),1))
 		
-		#BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G,weight='weight'),orient='index',columns=['BC']) #è già normalizzata
-		#BC = BC.set_index(np.arange(0,len(BC),1))
+		BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G,weight='weight'),orient='index',columns=['BC']) #è già normalizzata
+		BC = BC.set_index(np.arange(0,len(BC),1))
 		
-		#CL = pd.DataFrame.from_dict(nx.closeness_centrality(G),orient='index',columns=['CL']) #è già normalizzata
-		#CL = CL.set_index(np.arange(0,len(CL),1))
+		CL = pd.DataFrame.from_dict(nx.closeness_centrality(G),orient='index',columns=['CL']) #è già normalizzata
+		CL = CL.set_index(np.arange(0,len(CL),1))
 		
 	
 		#dataframe
-		#df = pd.concat([degree,degNN,BC,CL], axis=1)
-		df = degree.copy()
+		#df = pd.concat([degree,degNN], axis=1)
+		df = pd.concat([degree,degNN,BC,CL], axis=1)
+		#df = degree.copy()
 		
 		
 	else:
@@ -103,18 +104,18 @@ def NetworkCharacterization(G):
 #%%
 
 #%%	
-NamesBC = FileNames('BC_','.png')
-NamesCL = FileNames('CL_','.png')
+NamesBC = FileNames('sub_BC_','.png')
+NamesCL = FileNames('sub_CL_','.png')
 NamesINvsOUT = FileNames('DegreeINvsOUT_','.png')
 NamesDegIN = FileNames('DegreeHistIN_','.png')
 NamesDegOUT = FileNames('DegreeHistOUT_','.png')
 NamesKNN = FileNames('SUB_degNN_deg_','.png')	
 	
 for i in range(len(G)):
-	#PlotBcClvsDegree(G[i],VirusNames[i],21,NamesBC[i],NamesCL[i])
+	#PlotBcClvsDegree(Gsub[i],VirusNames[i],21,NamesBC[i],NamesCL[i])
 	#PlotINvsOUT(G[i],VirusNames[i],NamesINvsOUT[i])
-	PlotDegreeHist(Gsub[i],VirusNames[i],NamesDegIN[i],NamesDegOUT[i])
-	#PlotDegreeNNvsDegree(Gsub[i],VirusNames[i],NamesKNN[i])
+	#PlotDegreeHist(Gsub[i],VirusNames[i],NamesDegIN[i],NamesDegOUT[i])
+	PlotDegreeNNvsDegree(Gsub[i],VirusNames[i],NamesKNN[i])
 	
 
 
@@ -126,8 +127,8 @@ for i in range(len(G)):
 	Gsub.append(Gsub_i)
 
 
-	
-	#%%
+
+#%%
 
 
 
@@ -145,7 +146,7 @@ def PlotDegreeHist(G,title,nomiIN,nomiOUT):
 		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
 		sns.set_style('whitegrid')
 		ax.set_title(title)
-		ax.hist(centrality['K']/1000,bins=30)
+		ax.hist(centrality['K']/1000,bins=30)#5000
 		ax.set_xlabel('Degree')
 		ax.set_ylabel('# Nodes')
 		
@@ -202,7 +203,7 @@ def PlotDegreeNNvsDegree(G,title,nomi):
 		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
 		sns.set_style('whitegrid')
 		ax.set_title(title)
-		ax.scatter(centrality['K'],centrality['K_nn'],s=20, alpha=0.4, edgecolors='b')
+		ax.scatter(centrality['K']/1000,centrality['K_nn']/1000,s=20, alpha=0.4, edgecolors='b')
 		ax.set_xlabel('K')
 		ax.set_ylabel('$K_{NN}$')
 		
@@ -325,8 +326,8 @@ def PlotBcClvsDegree(G,title,n,nomipersalvataggioBC,nomipersalvataggioCL): #n = 
 			
 			
 			mu = Mean(centrality['K'].iloc[i*n:(i+1)*n].to_numpy())
-			deg_i = mu[0]
-			deg_err_i = mu[1]
+			deg_i = mu[0]/1000
+			deg_err_i = mu[1]/1000
 		
 
 			mu = Mean(centrality['BC'].iloc[i*n:(i+1)*n].to_numpy())
@@ -354,9 +355,9 @@ def PlotBcClvsDegree(G,title,n,nomipersalvataggioBC,nomipersalvataggioCL): #n = 
 		
 		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
 		sns.set_style('whitegrid')
-		ax.scatter(deg_in,bc,s=30, alpha=0.5, edgecolors='r',label='BC',facecolors='r')
+		ax.scatter(deg,bc,s=30, alpha=0.5, edgecolors='r',label='BC',facecolors='r')
 		#ax.scatter(centrality['Kin'],centrality['BC'])
-		ax.errorbar(deg_in,bc, yerr=bc_err, fmt="|",color='r')
+		ax.errorbar(deg,bc, yerr=bc_err, fmt="|",color='r')
 		ax.set_title(title)
 		ax.set_xlabel('Degree')
 		ax.set_ylabel('Averaged Betweenness Centrality')
@@ -366,8 +367,8 @@ def PlotBcClvsDegree(G,title,n,nomipersalvataggioBC,nomipersalvataggioCL): #n = 
 	
 		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
 		sns.set_style('whitegrid')
-		ax.scatter(deg_in,c,s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
-		ax.errorbar(deg_in,c, yerr=c_err, fmt="|",color='g')
+		ax.scatter(deg,c,s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
+		ax.errorbar(deg,c, yerr=c_err, fmt="|",color='g')
 		#ax.scatter(centrality['Kin'],centrality['CL'])
 		ax.set_title(title)
 		ax.set_xlabel('Degree')
