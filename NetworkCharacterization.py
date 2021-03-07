@@ -110,12 +110,12 @@ NamesINvsOUT = FileNames('DegreeINvsOUT_','.png')
 NamesDegIN = FileNames('DegreeHistIN_','.png')
 NamesDegOUT = FileNames('DegreeHistOUT_','.png')
 NamesKNN = FileNames('SUB_degNN_deg_','.png')	
-	
+#%%
 for i in range(len(G)):
-	#PlotBcClvsDegree(Gsub[i],VirusNames[i],21,NamesBC[i],NamesCL[i])
-	#PlotINvsOUT(G[i],VirusNames[i],NamesINvsOUT[i])
-	#PlotDegreeHist(Gsub[i],VirusNames[i],NamesDegIN[i],NamesDegOUT[i])
-	PlotDegreeNNvsDegree(Gsub[i],VirusNames[i],NamesKNN[i])
+	#PlotBcClvsDegree(Gsub[i],VirusNames[i],21)#,NamesBC[i],NamesCL[i])
+#PlotINvsOUT(Gsub[i],VirusNames[i])#,NamesINvsOUT[i])
+	PlotDegreeHist(Gsub[i],VirusNames[i])#,NamesDegIN[i],NamesDegOUT[i])
+#PlotDegreeNNvsDegree(G[i],VirusNames[i])#,NamesKNN[i])
 	
 
 
@@ -135,7 +135,7 @@ for i in range(len(G)):
 
 
 
-def PlotDegreeHist(G,title,nomiIN,nomiOUT):
+def PlotDegreeHist(G,title):#,nomiIN,nomiOUT):
 	
 	
 	centrality = NetworkCharacterization(G)
@@ -143,7 +143,7 @@ def PlotDegreeHist(G,title,nomiIN,nomiOUT):
 
 	if nx.is_directed(G) == False:
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
 		ax.set_title(title)
 		ax.hist(centrality['K']/1000,bins=30)#5000
@@ -159,7 +159,7 @@ def PlotDegreeHist(G,title,nomiIN,nomiOUT):
 		human = centrality[1]
 		virus = centrality[2]
 		
-		fig1, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig1, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
 		ax1.set_title(title)		
 		ax1.hist([human['Kin'],virus['Kin']],bins=30, histtype='barstacked')
@@ -167,9 +167,9 @@ def PlotDegreeHist(G,title,nomiIN,nomiOUT):
 		ax1.set_ylabel('# Nodes')
 		ax1.legend(['Homo sapiens','Virus'])
 		
-		plt.savefig(nomiIN)
+		#plt.savefig(nomiIN)
 		
-		fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
 		ax2.set_title(title)	
 		ax2.hist([human['Kout'],virus['Kout']],bins=30, histtype='barstacked')
@@ -177,7 +177,7 @@ def PlotDegreeHist(G,title,nomiIN,nomiOUT):
 		ax2.set_ylabel('# Nodes')
 		ax2.legend(['Homo sapiens','Virus'])
 		
-		plt.savefig(nomiOUT)
+		#plt.savefig(nomiOUT)
 		
 		plt.show()
 		
@@ -192,7 +192,7 @@ def PlotDegreeHist(G,title,nomiIN,nomiOUT):
 
 
 
-def PlotDegreeNNvsDegree(G,title,nomi):
+def PlotDegreeNNvsDegree(G,title):#,nomi):
 
 	
 	centrality = NetworkCharacterization(G)
@@ -200,7 +200,7 @@ def PlotDegreeNNvsDegree(G,title,nomi):
 
 	if nx.is_directed(G) == False:
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
 		ax.set_title(title)
 		ax.scatter(centrality['K']/1000,centrality['K_nn']/1000,s=20, alpha=0.4, edgecolors='b')
@@ -219,18 +219,25 @@ def PlotDegreeNNvsDegree(G,title,nomi):
 		human = centrality[1]
 		virus = centrality[2]
 		
-		fig, (ax1,ax2) = plt.subplots(nrows=2, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
-		ax1.set_title(title)
-		ax1.scatter(human['Kin'],human['Kin_nn'],s=30, alpha=0.5, edgecolors='b')
-		ax1.scatter(virus['Kin'],virus['Kin_nn'],s=30, alpha=0.5, edgecolors='r')
+		ax.set_title(title)
+		ax.scatter(human['Kin'],human['Kin_nn'],s=30, alpha=0.5, edgecolors='b')
+		ax.scatter(virus['Kin'],virus['Kin_nn'],s=30, alpha=0.5, edgecolors='r')
+		ax.set_xlabel('$K_{IN}$')
+		ax.set_ylabel('$K_{NN,IN}$')	
+		
+		plt.show()
 	
-		ax2.scatter(human['Kout'],human['Kout_nn'],s=30, alpha=0.5, edgecolors='b')
-		ax2.scatter(virus['Kout'],virus['Kout_nn'],s=30, alpha=0.5, edgecolors='r')
-		ax1.legend(title='$K_{NN,IN}$ vs $K_{IN}$')
-		ax2.legend(title='$K_{NN,OUT}$ vs $K_{OUT}$')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
+		sns.set_style('whitegrid')
+		ax.set_title(title)
+		ax.scatter(human['Kout'],human['Kout_nn'],s=30, alpha=0.5, edgecolors='b')
+		ax.scatter(virus['Kout'],virus['Kout_nn'],s=30, alpha=0.5, edgecolors='r')
+		ax.set_xlabel('$K_{OUT}$')
+		ax.set_ylabel('$K_{NN,OUT}$')
 
-		plt.savefig(nomi)
+		#plt.savefig(nomi)
 		
 		plt.show()
 		
@@ -242,7 +249,7 @@ def PlotDegreeNNvsDegree(G,title,nomi):
 	
 	
 
-def PlotINvsOUT(G,title,nomipersalvataggio):
+def PlotINvsOUT(G,title):#,nomipersalvataggio):
 	
 	centrality = NetworkCharacterization(G)
 	
@@ -257,7 +264,7 @@ def PlotINvsOUT(G,title,nomipersalvataggio):
 		human = centrality[1]
 		virus = centrality[2]
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
 		ax.set_title(title)
 		ax.scatter(human['Kin'],human['Kout'],s=30, alpha=0.5, edgecolors='b')
@@ -266,7 +273,7 @@ def PlotINvsOUT(G,title,nomipersalvataggio):
 		ax.set_xlabel('Degree IN')
 		ax.set_ylabel('Degree OUT')
 
-		plt.savefig(nomipersalvataggio)
+		#plt.savefig(nomipersalvataggio)
 		
 		plt.show()
 		
@@ -300,7 +307,7 @@ def Mean(array):
 
 
 
-def PlotBcClvsDegree(G,title,n,nomipersalvataggioBC,nomipersalvataggioCL): #n = number of the values to average
+def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n = number of the values to average
 	
 
 	if nx.is_directed(G) == False:
@@ -353,28 +360,28 @@ def PlotBcClvsDegree(G,title,n,nomipersalvataggioBC,nomipersalvataggioCL): #n = 
 
 		
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
-		ax.scatter(deg,bc,s=30, alpha=0.5, edgecolors='r',label='BC',facecolors='r')
-		#ax.scatter(centrality['Kin'],centrality['BC'])
+		ax.scatter(deg,bc,s=30 ,edgecolors='r',label='averaged BC',facecolors='r')
+		ax.scatter(centrality['K']/1000,centrality['BC'],s=30, alpha=0.3, edgecolors='b',label='BC')
 		ax.errorbar(deg,bc, yerr=bc_err, fmt="|",color='r')
 		ax.set_title(title)
 		ax.set_xlabel('Degree')
-		ax.set_ylabel('Averaged Betweenness Centrality')
-		
-		plt.savefig(nomipersalvataggioBC)	
+		ax.set_ylabel('Betweenness Centrality')
+		ax.legend()
+		#plt.savefig(nomipersalvataggioBC)	
 		
 	
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
-		ax.scatter(deg,c,s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
+		ax.scatter(deg,c,s=30, edgecolors='g',label='averaged CL',facecolors='g')
 		ax.errorbar(deg,c, yerr=c_err, fmt="|",color='g')
-		#ax.scatter(centrality['Kin'],centrality['CL'])
+		ax.scatter(centrality['K']/1000,centrality['CL'],s=30, alpha=0.3, edgecolors='b',label='CL')
 		ax.set_title(title)
 		ax.set_xlabel('Degree')
-		ax.set_ylabel('Averaged Closeness Centrality')
-		
-		plt.savefig(nomipersalvataggioCL)	
+		ax.set_ylabel('Closeness Centrality')
+		ax.legend()
+		#plt.savefig(nomipersalvataggioCL)	
 		
 		plt.show()
 		
@@ -430,28 +437,30 @@ def PlotBcClvsDegree(G,title,n,nomipersalvataggioBC,nomipersalvataggioCL): #n = 
 
 		
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
-		ax.scatter(deg_in,bc,s=30, alpha=0.5, edgecolors='r',label='BC',facecolors='r')
-		#ax.scatter(centrality['Kin'],centrality['BC'])
+		ax.scatter(deg_in,bc,s=30 ,edgecolors='r',label='averaged BC',facecolors='r')
+		ax.scatter(centrality['Kin'],centrality['BC'],s=30, alpha=0.3, edgecolors='b',label='BC')
 		ax.errorbar(deg_in,bc, yerr=bc_err, fmt="|",color='r')
 		ax.set_title(title)
 		ax.set_xlabel('Degree IN')
-		ax.set_ylabel('Averaged Betweenness Centrality')
+		ax.set_ylabel('Betweenness Centrality')
+		ax.legend()
 		
-		plt.savefig(nomipersalvataggioBC)	
+		#plt.savefig(nomipersalvataggioBC)	
 		
 	
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4,3))
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
-		ax.scatter(deg_in,c,s=30, alpha=0.5, edgecolors='g',label='CL',facecolors='g')
+		ax.scatter(deg_in,c,s=30, edgecolors='g',label='averaged CL',facecolors='g')
 		ax.errorbar(deg_in,c, yerr=c_err, fmt="|",color='g')
-		#ax.scatter(centrality['Kin'],centrality['CL'])
+		ax.scatter(centrality['Kin'],centrality['CL'],s=30, alpha=0.3, edgecolors='b',label='CL')
 		ax.set_title(title)
 		ax.set_xlabel('Degree IN')
-		ax.set_ylabel('Averaged Closeness Centrality')
+		ax.set_ylabel('Closeness Centrality')
+		ax.legend()
 		
-		plt.savefig(nomipersalvataggioCL)	
+		#plt.savefig(nomipersalvataggioCL)	
 		
 		plt.show()
 	

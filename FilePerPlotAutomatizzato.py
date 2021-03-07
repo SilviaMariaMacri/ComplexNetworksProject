@@ -50,7 +50,7 @@ import IterativePercolation
 sapiens = pd.read_csv('9606.protein.links.v11.0.txt', sep=" ", 
                     usecols=['protein1', 'protein2', 'combined_score']) 
 #select human PPI links depending on the score
-sapiens=sapiens[sapiens['combined_score']>400]
+sapiens=sapiens[sapiens['combined_score']>250]
 
 
 
