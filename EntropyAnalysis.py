@@ -9,7 +9,7 @@ import os
 import entropy_canonical_function
 import pandas as pd
 import networkx as nx
-import entropy_canonical_solofunzione
+#import entropy_canonical_solofunzione
 #%%
 
 NameVirusFile = ['string_interactions_WNV.tsv','string_interactions_varicella.tsv'				 
@@ -63,27 +63,26 @@ VirusNames=['WNV','Varicella zoster virus','SARS-CoV','Human parechovirus 2',
 	
 #%%
 #ENTROPY ANALYSIS VIRUS NETWORKS	
-directory= '/home/caterina/Scrivania/CN'
-os.chdir(directory)
-S0c_array=[]
-Src_array=[]	
-S0s_array=[]
-Srs_array=[]
+#directory= '/home/caterina/Scrivania/CN'
+#os.chdir(directory)
+virus_S0_array=[]
+virus_Sr_array=[]	
+
 	
 
 
 for i in range(len(NameVirusFile)):
-	pp = nx.to_pandas_adjacency(GV[i],weight='weight')
-	[S_0, S_r, z, P]=entropy_canonical_function.entropy_canonical_c(pp)
-	S0c_array.append(S_0)
-	Src_array.append(S_r)
-	[S_0, S_r, z, P]=entropy_canonical_solofunzione.entropy_canonical_s(pp)
-	S0s_array.append(S_0)
-	Srs_array.append(S_r)
-entropy_dict={'S0 cate':S0c_array, 'S0 silvia':S0s_array, 'Sr cate':Src_array, 'Sr silvia':Srs_array }
-entropy_virus=pd.DataFrame(data=entropy_dict)
-entropy_virus.to_csv('Entropy_Virus.tsv', sep="\t", index=False) 
-#%%
+	pp = nx.to_pandas_adjacency(G[i],weight='weight')
+	[S_0, S_r, z, P]=entropy_canonical_function.entropy_canonical_directed(pp)
+	virus_S0_array.append(S_0)
+	virus_Sr_array.append(S_r)
+
+#entropy_dict={'S0 cate':S0c_array, 'S0 silvia':S0s_array, 'Sr cate':Src_array, 'Sr silvia':Srs_array }
+#entropy_virus=pd.DataFrame(data=entropy_dict)
+#entropy_virus.to_csv('Entropy_Virus.tsv', sep="\t", index=False) 
+#%%   NON USARE
+
+
 #ENTROPY ANALYSIS VIRUS NETWORKS MADE UNDIRECTED	
 directory= '/home/caterina/Scrivania/CN'
 os.chdir(directory)
@@ -102,26 +101,26 @@ for i in range(len(NameVirusFile)):
 	[S_0, S_r, z, P]=entropy_canonical_solofunzione.entropy_canonical_s(pp)
 	S0s_array.append(S_0)
 	Srs_array.append(S_r)
-entropy_dict={'S0 cate':S0c_array, 'S0 silvia':S0s_array, 'Sr cate':Src_array, 'Sr silvia':Srs_array }
-entropy_virus_und=pd.DataFrame(data=entropy_dict)
+	
+	#%%
+entropy_dict={'S0 virus':virus_S0_array, 'S0 sub':sub_S0_array, 'Sr virus':virus_Sr_array, 'Sr sub':sub_Sr_array }
+entropy=pd.DataFrame(data=entropy_dict)
+#%%
 entropy_virus_und.to_csv('Entropy_Virus_undirected.tsv', sep="\t", index=False) 
 
 
 #%%
 #ENTROPY ANALYSIS SUBNETWORKS	
-S0c_array=[]
-Src_array=[]	
-S0s_array=[]
-Srs_array=[]
+sub_S0_array=[]
+sub_Sr_array=[]	
+
 	
 for i in range(len(NameVirusFile)):
 	pp = (nx.to_pandas_adjacency(Gsub[i],weight='weight')/1000)
-	[S_0, S_r, z, P]=entropy_canonical_function.entropy_canonical_c(pp)
-	S0c_array.append(S_0)
-	Src_array.append(S_r)
-	[S_0, S_r, z, P]=entropy_canonical_solofunzione.entropy_canonical_s(pp)
-	S0s_array.append(S_0)
-	Srs_array.append(S_r)
-entropy_dict={'S0 cate':S0c_array, 'S0 silvia':S0s_array, 'Sr cate':Src_array, 'Sr silvia':Srs_array }
-entropy_sub=pd.DataFrame(data=entropy_dict)
-entropy_sub.to_csv('Entropy_Sub.tsv', sep="\t", index=False) 
+	[S_0, S_r, z, P]=entropy_canonical_function.entropy_canonical_undirected(pp)
+	sub_S0_array.append(S_0)
+	sub_Sr_array.append(S_r)
+	
+#entropy_dict={'S0 cate':S0c_array, 'S0 silvia':S0s_array, 'Sr cate':Src_array, 'Sr silvia':Srs_array }
+#entropy_sub=pd.DataFrame(data=entropy_dict)
+#entropy_sub.to_csv('Entropy_Sub.tsv', sep="\t", index=False) 
