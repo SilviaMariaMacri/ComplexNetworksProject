@@ -6,6 +6,7 @@ Created on Thu Mar  4 21:33:14 2021
 @author: caterina
 """
 import NetworksBuilder
+import Percolation_functions
 
 NameHumanFile='9606.protein.links.v11.0.txt'
 
@@ -22,6 +23,7 @@ VirusNames=['WNV','Varicella zoster virus','SARS-CoV','Human parechovirus 2',
 			'Mumps virus','MARV','Lassa virus','Influenza A','HTLV1','HPV type 1a',
 			'HIV1','Hepatitis B','Ebola','Dengue type 2','Cytomegalo','SARS-CoV-2']
 
+
 GH=NetworksBuilder.HumanGraph(NameHumanFile,250) #human PPI network
 
 GV=[] #list of human-virus PPI
@@ -32,3 +34,12 @@ for i in range (len(NameVirusFile)):
 Gsub=[] #list of human PPI subnetworks related to each virus
 for i in range (len(NameVirusFile)):
 	Gsub.append(NetworksBuilder.SubnetworkGraphs (GH,GV[i], VirusNames[i]))
+
+#Network CHaracterization:
+
+#Percolation: 
+#(cartella dove andranno salvati i grafici?)
+#directory= '/home/caterina/Scrivania/CN/grafici'
+#os.chdir(directory)
+Percolation_functions.PercolationSubgraphs(Gsub,NameVirusFile,VirusNames)	
+Percolation_functions.PercolationVirus(GV,NameVirusFile,VirusNames)
