@@ -59,10 +59,10 @@ def NetworkCharacterization(G):
 		degreeOUT.columns=['Nodes','Kout']
 		degreeOUT = degreeOUT['Kout']
 		
-		degNN_IN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='in', target='in',weight='weight'),orient='index',columns=['Kin_nn'])
+		degNN_IN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='in', target='out',weight='weight'),orient='index',columns=['Kin_nn'])
 		degNN_IN = degNN_IN.set_index(np.arange(0,len(degNN_IN),1))
 		
-		degNN_OUT = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='out', target='out',weight='weight'),orient='index',columns=['Kout_nn'])
+		degNN_OUT = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='out', target='in',weight='weight'),orient='index',columns=['Kout_nn'])
 		degNN_OUT = degNN_OUT.set_index(np.arange(0,len(degNN_OUT),1))
 	
 		BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G,weight='weight'),orient='index',columns=['BC'])
@@ -143,12 +143,17 @@ def PlotDegreeHist(G,title):#,nomiIN,nomiOUT):
 
 	if nx.is_directed(G) == False:
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
-		sns.set_style('whitegrid')
-		ax.set_title(title)
-		ax.hist(centrality['K']/1000,bins=30)#5000
-		ax.set_xlabel('Degree')
-		ax.set_ylabel('# Nodes')
+
+In [50]: fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
+    ...: sns.set_style('whitegrid')
+    ...: #ax.set_title(title)
+    ...: ax.hist(centrality['K']/1000,bins=30)#5000
+    ...: ax.set_xlabel('Degree')
+    ...: ax.set_ylabel('# Nodes')
+Out[50]: Text(0, 0.5, '# Nodes')
+￼
+
+In [51]: 
 		
 		
 		
