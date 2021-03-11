@@ -1,4 +1,3 @@
 # ComplexNetworksProject
  
-\emph{Structure of the project}
-
+# Structure of ht eproject
