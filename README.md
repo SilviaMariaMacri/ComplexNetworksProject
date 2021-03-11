@@ -1,4 +1,4 @@
 # ComplexNetworksProject
  
-\txtbf{Structure of the project}
+\emph{Structure of the project}
 
