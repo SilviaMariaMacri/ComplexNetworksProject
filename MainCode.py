@@ -1,45 +1,196 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Mar  4 21:33:14 2021
+import os 
 
-@author: caterina
-"""
-import NetworksBuilder
-import Percolation_functions
+directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/ComplexNetworksProject/ComplexNetworksProject'
+#directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject/data'
+os.chdir(directory) 
 
+
+
+
+
+
+#%%  create human and human-virus PPI graphs 
+
+
+# STRING file of human PPI network
 NameHumanFile='9606.protein.links.v11.0.txt'
 
-NameVirusFile = ['string_interactions_WNV.tsv','string_interactions_varicella.tsv'				 
-				 ,'string_interactions_SARSCov.tsv','string_interactions_parechovirus2.tsv',
-				 'string_interactions_mumps.tsv','string_interactions_MARV.tsv',
-				 'string_interactions_lassa.tsv','string_interactions_InfluenzaA.tsv',
-				 'string_interactions_HTLV-1.tsv','string_interactions_HPV1a.tsv',
-				 'string_interactions_HIV1_553.tsv','string_interactions_hepatitisB.tsv',
-				 'string_interactions_ebola.tsv','string_interactions_dengue2.tsv',
-				 'string_interactions_cytomegalo.tsv','Covid19.txt']
+# STRING files of human-virus PPI networks
+NameVirusFile = ['string_interactions_cytomegalo.tsv',
+				 'string_interactions_dengue2.tsv',
+				 'string_interactions_ebola.tsv',
+				 'string_interactions_hepatitisB.tsv',
+				 'string_interactions_HIV1_553.tsv',
+				 'string_interactions_HPV1a.tsv',
+				 'string_interactions_HTLV-1.tsv',
+				 'string_interactions_InfluenzaA.tsv',
+				 'string_interactions_lassa.tsv',
+				 'string_interactions_MARV.tsv',
+				 'string_interactions_mumps.tsv',
+				 'string_interactions_parechovirus2.tsv',
+				 'string_interactions_SARSCov.tsv',
+				 'string_interactions_varicella.tsv',
+				 'string_interactions_WNV.tsv']#,'Covid19.txt']
 
-VirusNames=['WNV','Varicella zoster virus','SARS-CoV','Human parechovirus 2',
-			'Mumps virus','MARV','Lassa virus','Influenza A','HTLV1','HPV type 1a',
-			'HIV1','Hepatitis B','Ebola','Dengue type 2','Cytomegalo','SARS-CoV-2']
+# list of considered viruses
+VirusNames=['Cytomegalo',
+			'Dengue type 2',
+			'Ebola',
+			'Hepatitis B',
+			'HIV1',
+			'HPV type 1a',
+			'HTLV1',
+			'Influenza A',
+			'Lassa virus',
+			'MARV',
+			'Mumps virus',
+			'Human parechovirus 2',
+			'SARS-CoV',
+			'Varicella zoster virus',
+			'WNV']#,'SARS-CoV-2']
 
 
-GH=NetworksBuilder.HumanGraph(NameHumanFile,250) #human PPI network
 
-GV=[] #list of human-virus PPI
+
+
+import NetworksBuilder
+
+
+
+#human PPI network
+GH=NetworksBuilder.HumanGraph(NameHumanFile,250,'human PPI')
+#list of human-virus PPI
+GV=[] 
 for i in range (len(NameVirusFile)):
-	GV.append(NetworksBuilder.VirusGraph(NameVirusFile[i],VirusNames[i]))
+	GV_i = NetworksBuilder.VirusGraph(NameVirusFile[i], VirusNames[i])
+	GV.append(GV_i)
 
-
-Gsub=[] #list of human PPI subnetworks related to each virus
+#list of human PPI subnetworks related to each virus
+Gsub=[] 
 for i in range (len(NameVirusFile)):
-	Gsub.append(NetworksBuilder.SubnetworkGraphs (GH,GV[i], VirusNames[i]))
+	Gsub_i = NetworksBuilder.SubGraph(GH,GV[i])
+	Gsub.append(Gsub_i)
+	
 
-#Network CHaracterization:
 
-#Percolation: 
-#(cartella dove andranno salvati i grafici?)
-#directory= '/home/caterina/Scrivania/CN/grafici'
-#os.chdir(directory)
-Percolation_functions.PercolationSubgraphs(Gsub,NameVirusFile,VirusNames)	
-Percolation_functions.PercolationVirus(GV,NameVirusFile,VirusNames)
+
+
+ 
+
+
+#%%  Network characterization
+
+
+
+import NetworkCharacterization
+
+
+
+# dataframe of K, Knn, BC, CLof human PPI network
+#GH_centrality = NetworkCharacterization.NetworkCharacterization(GH)
+
+
+GV_centrality = []
+for i in range(len(GV)):
+	# list of three dataframes of human-virus PPI network 
+	# (complete graph, subgraph of human nodes and subgraph of virus nodes)
+	# K, Kin, Kout, Knn_in, Knn_out, BC, CL
+	GV_centrality_i = NetworkCharacterization.NetworkCharacterization(GV[i])
+	GV_centrality.append(GV_centrality_i)
+	
+	
+Gsub_centrality = []
+for i in range(len(Gsub)):
+	# dataframe of human PPI subgraph
+	# K, Knn, BC, CL
+	Gsub_centrality_i = NetworkCharacterization.NetworkCharacterization(Gsub[i])
+	Gsub_centrality.append(Gsub_centrality_i)
+
+
+
+
+
+
+#%%
+
+
+
+# characterization plots of human PPI network
+
+NetworkCharacterization.PlotDegreeHist(GH_centrality,'Human PPI network')
+NetworkCharacterization.PlotDegreeNNvsDegree(GH_centrality,'Human PPI network')
+NetworkCharacterization.PlotINvsOUT(GH_centrality,'Human PPI network')
+n=1000
+NetworkCharacterization.PlotBcClvsDegree(GH_centrality,'Human PPI network',n)
+
+
+
+
+
+# characterization plots of human-virus PPI networks 
+
+for i in range(len(GV)):
+	# histogram of degree
+	NetworkCharacterization.PlotDegreeHist(GV_centrality[i],VirusNames[i])
+	# knn vs K
+	NetworkCharacterization.PlotDegreeNNvsDegree(GV_centrality[i],VirusNames[i])
+	# Kin vs Kout
+	NetworkCharacterization.PlotINvsOUT(GV_centrality[i],VirusNames[i])
+	# BC,Cl vs K
+	n=21
+	NetworkCharacterization.PlotBcClvsDegree(GV_centrality[i],VirusNames[i],n)
+
+
+
+# characterization plots of human PPI subgraphs
+
+for i in range(len(Gsub)):
+	# histogram of degree
+	NetworkCharacterization.PlotDegreeHist(Gsub_centrality[i],VirusNames[i])
+	# Knn vs K
+	NetworkCharacterization.PlotDegreeNNvsDegree(Gsub_centrality[i],VirusNames[i])
+	# BC,CL vs K
+	n=21
+	NetworkCharacterization.PlotBcClvsDegree(Gsub_centrality[i],VirusNames[i],n)
+
+
+
+#%%  Percolation
+
+import Percolation
+
+
+for i in range(len(GV)):
+	Percolation.Percolation(GV[i], GV_centrality[i], VirusNames[i])
+
+
+for i in range(len(Gsub)):
+	Percolation.Percolation(Gsub[i], Gsub_centrality[i], VirusNames[i])
+	
+	
+	
+#%%  Entropy
+
+
+import EntropyCanonical
+
+
+E = EntropyCanonical.EntropyDifference(VirusNames,Gsub,GV)
+	
+
+
+
+
+
+#%%
+
+
+
+	
+###FUNZIONE PER DARE I NOMI AI FILE DEI GRAFICI
+#il nome del file diventa: Prefisso + nome virus + formato del file
+#def FileNames(Prefix, FileType): 
+#	newnames=[]
+#	for a in range (len(VirusNames)):
+#		newnames.append(f"{Prefix}{VirusNames[a]}{FileType}")
+#	return newnames

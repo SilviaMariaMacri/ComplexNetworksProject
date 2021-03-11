@@ -1,6 +1,0 @@
-NumberRemovedNodes
-20
-1597
-14740
-2901
-15

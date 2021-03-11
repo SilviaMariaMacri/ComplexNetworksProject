@@ -1,23 +1,28 @@
 import networkx as nx
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as pl
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 
 
+
+
+
+
+
 '''
- INPUT:
+##### INPUT:
  G = directed or undirected network
 
- OUTPUT:
+##### OUTPUT:
  if G undirected: 
  	df = dataframe with degree, degree of nearest neighbors, betweenness 
         centrality and closeness centrality as columns and each row corresponding 
         to a node of the network	
  if G directed:
 	df = array of three dataframes as entries: 
-	df[0] = dataframe with In degree, Out degree, In degree of nearest neighbors, 
+	df[0] = dataframe with degree, In degree, Out degree, In degree of nearest neighbors, 
             Out degree of nearest neighbors, betweenness centrality and closeness 
             centrality as columns and each row corresponding to a node 
     df[1] = dataframe with same columns of df[0] and row corresponding only to 
@@ -25,6 +30,9 @@ import seaborn as sns
     df[2] = dataframe with same columns of df[0] and row corresponding only to 
             viral nodes
 '''
+
+
+
 
 
 def NetworkCharacterization(G):
@@ -45,15 +53,18 @@ def NetworkCharacterization(G):
 		
 	
 		#dataframe
-		#df = pd.concat([degree,degNN], axis=1)
 		df = pd.concat([degree,degNN,BC,CL], axis=1)
-		#df = degree.copy()
+
 		
 		
 	else:
 		
+		degree = pd.DataFrame.from_dict(G.degree(weight='weight')) 
+		degree.columns=['Nodes','K']
+		
 		degreeIN = pd.DataFrame.from_dict(G.in_degree(weight='weight'))
 		degreeIN.columns=['Nodes','Kin']
+		degreeIN = degreeIN['Kin']
 		
 		degreeOUT = pd.DataFrame.from_dict(G.out_degree(G,weight='weight'))
 		degreeOUT.columns=['Nodes','Kout']
@@ -73,7 +84,7 @@ def NetworkCharacterization(G):
 		
 		
 		
-		df_complete = pd.concat([degreeIN,degreeOUT,degNN_IN,degNN_OUT,BC,CL], axis=1)
+		df_complete = pd.concat([degree,degreeIN,degreeOUT,degNN_IN,degNN_OUT,BC,CL], axis=1)
 
 
 		#split dataframe in human and viral part
@@ -101,71 +112,47 @@ def NetworkCharacterization(G):
 	return df
 
 
-#%%
-
-#%%	
-NamesBC = FileNames('sub_BC_','.png')
-NamesCL = FileNames('sub_CL_','.png')
-NamesINvsOUT = FileNames('DegreeINvsOUT_','.png')
-NamesDegIN = FileNames('DegreeHistIN_','.png')
-NamesDegOUT = FileNames('DegreeHistOUT_','.png')
-NamesKNN = FileNames('SUB_degNN_deg_','.png')	
-#%%
-for i in range(len(G)):
-	#PlotBcClvsDegree(Gsub[i],VirusNames[i],21)#,NamesBC[i],NamesCL[i])
-#PlotINvsOUT(Gsub[i],VirusNames[i])#,NamesINvsOUT[i])
-	PlotDegreeHist(Gsub[i],VirusNames[i])#,NamesDegIN[i],NamesDegOUT[i])
-#PlotDegreeNNvsDegree(G[i],VirusNames[i])#,NamesKNN[i])
-	
-
-
-#%%
-
-Gsub = []
-for i in range(len(G)):
-	Gsub_i = GH.subgraph(nx.nodes(G[i]))
-	Gsub.append(Gsub_i)
 
 
 
-#%%
-
-
-
-
-
-
-def PlotDegreeHist(G,title):#,nomiIN,nomiOUT):
-	
-	
+'''
+INPUT:
 	centrality = NetworkCharacterization(G)
+	title of the plot
+OUTPUT:
+	plot of histogram degree (distinction in two plots corresponding to IN 
+						        and OUT degree in case of direct network)
+'''
+
+
+
+ 
+def PlotDegreeHist(centrality,title):#,nomiIN,nomiOUT):
 	
-
-	if nx.is_directed(G) == False:
-		
-
-In [50]: fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
-    ...: sns.set_style('whitegrid')
-    ...: #ax.set_title(title)
-    ...: ax.hist(centrality['K']/1000,bins=30)#5000
-    ...: ax.set_xlabel('Degree')
-    ...: ax.set_ylabel('# Nodes')
-Out[50]: Text(0, 0.5, '# Nodes')
-￼
-
-In [51]: 
+	
+	# undirected network
+	if type(centrality) == pd.core.frame.DataFrame:
 		
 		
+		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
+		ax.set_title(title)
+		ax.hist(centrality['K']/1000,bins=30)#5000
+		ax.set_xlabel('Degree')
+		ax.set_ylabel('# Nodes')
+	
 		
 		plt.show()
 		
+		
+	# directed network	
 	else:
 		
 		human = centrality[1]
 		virus = centrality[2]
 		
-		fig1, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig1, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax1.set_title(title)		
 		ax1.hist([human['Kin'],virus['Kin']],bins=30, histtype='barstacked')
 		ax1.set_xlabel('Degree IN')
@@ -174,8 +161,8 @@ In [51]:
 		
 		#plt.savefig(nomiIN)
 		
-		fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig2, ax2 = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax2.set_title(title)	
 		ax2.hist([human['Kout'],virus['Kout']],bins=30, histtype='barstacked')
 		ax2.set_xlabel('Degree OUT')
@@ -197,18 +184,28 @@ In [51]:
 
 
 
-def PlotDegreeNNvsDegree(G,title):#,nomi):
 
-	
+'''
+INPUT:
 	centrality = NetworkCharacterization(G)
-	
+	title of the plot
+OUTPUT:
+	plot of average neighbor degree vs degree (distinction in two plots 
+	corresponding to IN and OUT degree in case of direct network)  
+'''
 
-	if nx.is_directed(G) == False:
+
+
+def PlotDegreeNNvsDegree(centrality,title):#,nomi):
+
+	
+	# undirected network
+	if type(centrality) == pd.core.frame.DataFrame:
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.set_title(title)
-		ax.scatter(centrality['K']/1000,centrality['K_nn']/1000,s=20, alpha=0.4, edgecolors='b')
+		ax.scatter(centrality['K']/1000,centrality['K_nn'],s=20, alpha=0.4, edgecolors='b')
 		ax.set_xlabel('K')
 		ax.set_ylabel('$K_{NN}$')
 		
@@ -218,29 +215,31 @@ def PlotDegreeNNvsDegree(G,title):#,nomi):
 
 	
 	
-		
+	# directed network	
 	else:
 		
 		human = centrality[1]
 		virus = centrality[2]
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.set_title(title)
-		ax.scatter(human['Kin'],human['Kin_nn'],s=30, alpha=0.5, edgecolors='b')
-		ax.scatter(virus['Kin'],virus['Kin_nn'],s=30, alpha=0.5, edgecolors='r')
+		ax.scatter(human['Kin'],human['Kin_nn'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
+		ax.scatter(virus['Kin'],virus['Kin_nn'],s=30, alpha=0.5, edgecolors='r', label='Virus')
 		ax.set_xlabel('$K_{IN}$')
-		ax.set_ylabel('$K_{NN,IN}$')	
+		ax.set_ylabel('$K_{NN,IN}$')
+		ax.legend()
 		
 		plt.show()
 	
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.set_title(title)
-		ax.scatter(human['Kout'],human['Kout_nn'],s=30, alpha=0.5, edgecolors='b')
-		ax.scatter(virus['Kout'],virus['Kout_nn'],s=30, alpha=0.5, edgecolors='r')
+		ax.scatter(human['Kout'],human['Kout_nn'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
+		ax.scatter(virus['Kout'],virus['Kout_nn'],s=30, alpha=0.5, edgecolors='r', label='Virus')
 		ax.set_xlabel('$K_{OUT}$')
 		ax.set_ylabel('$K_{NN,OUT}$')
+		ax.legend()
 
 		#plt.savefig(nomi)
 		
@@ -253,30 +252,45 @@ def PlotDegreeNNvsDegree(G,title):#,nomi):
 	
 	
 	
-
-def PlotINvsOUT(G,title):#,nomipersalvataggio):
 	
+	
+	
+	
+'''
+INPUT:
 	centrality = NetworkCharacterization(G)
+	title of the plot
+OUTPUT:
+	plot of IN degree vs OUT degree (Error if G undirected)
+'''
+
+	
 	
 
-	if nx.is_directed(G) == False:
+def PlotINvsOUT(centrality,title):#,nomipersalvataggio):
+	
+	
+	# undirected network
+	if type(centrality) == pd.core.frame.DataFrame:
 		
 		print('Error')
 		
 	
+	# directed network
 	else:
 		
 		human = centrality[1]
 		virus = centrality[2]
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.set_title(title)
-		ax.scatter(human['Kin'],human['Kout'],s=30, alpha=0.5, edgecolors='b')
-		ax.scatter(virus['Kin'],virus['Kout'],s=30, alpha=0.5, edgecolors='r')
+		ax.scatter(human['Kin'],human['Kout'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
+		ax.scatter(virus['Kin'],virus['Kout'],s=30, alpha=0.5, edgecolors='r', label='Virus')
 	
 		ax.set_xlabel('Degree IN')
 		ax.set_ylabel('Degree OUT')
+		ax.legend()
 
 		#plt.savefig(nomipersalvataggio)
 		
@@ -290,6 +304,20 @@ def PlotINvsOUT(G,title):#,nomipersalvataggio):
 
 
 
+
+
+
+
+
+
+	
+'''
+INPUT:
+	array of numbers
+OUTPUT:
+	mu = average 
+	sigma = mean error
+'''
 
 
 
@@ -312,12 +340,33 @@ def Mean(array):
 
 
 
-def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n = number of the values to average
+
+
+
+
+
+
+
+
+	
+'''
+INPUT:
+	centrality = NetworkCharacterization(G)
+	title = title of the plot
+	n = number of nodes used to calculate the average of the correpsonding centrality measures
+OUTPUT:
+	plot of BC + averaged BC vs degree
+	plot of CL + averaged CL vs degree
+'''
+
+
+
+def PlotBcClvsDegree(centrality,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n = number of the values to average
 	
 
-	if nx.is_directed(G) == False:
+	# undirected network
+	if type(centrality) == pd.core.frame.DataFrame:
 		
-		centrality = NetworkCharacterization(G)
 		centrality = centrality.sort_values('K')
 		
 		
@@ -365,8 +414,8 @@ def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n
 
 		
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.scatter(deg,bc,s=30 ,edgecolors='r',label='averaged BC',facecolors='r')
 		ax.scatter(centrality['K']/1000,centrality['BC'],s=30, alpha=0.3, edgecolors='b',label='BC')
 		ax.errorbar(deg,bc, yerr=bc_err, fmt="|",color='r')
@@ -377,8 +426,8 @@ def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n
 		#plt.savefig(nomipersalvataggioBC)	
 		
 	
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.scatter(deg,c,s=30, edgecolors='g',label='averaged CL',facecolors='g')
 		ax.errorbar(deg,c, yerr=c_err, fmt="|",color='g')
 		ax.scatter(centrality['K']/1000,centrality['CL'],s=30, alpha=0.3, edgecolors='b',label='CL')
@@ -390,14 +439,16 @@ def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n
 		
 		plt.show()
 		
+	
 		
+	# directed network
 	else:
 		
 		
 
 		
-		centrality1, centrality2, centrality3 = NetworkCharacterization(G)
-		centrality = centrality1.sort_values('Kin')
+		#centrality1, centrality2, centrality3 = NetworkCharacterization(G)
+		centrality = centrality[0].sort_values('Kin')
 		
 		
 		deg_in = []
@@ -442,8 +493,8 @@ def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n
 
 		
 		
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.scatter(deg_in,bc,s=30 ,edgecolors='r',label='averaged BC',facecolors='r')
 		ax.scatter(centrality['Kin'],centrality['BC'],s=30, alpha=0.3, edgecolors='b',label='BC')
 		ax.errorbar(deg_in,bc, yerr=bc_err, fmt="|",color='r')
@@ -455,8 +506,8 @@ def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n
 		#plt.savefig(nomipersalvataggioBC)	
 		
 	
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		sns.set_style('whitegrid')
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.scatter(deg_in,c,s=30, edgecolors='g',label='averaged CL',facecolors='g')
 		ax.errorbar(deg_in,c, yerr=c_err, fmt="|",color='g')
 		ax.scatter(centrality['Kin'],centrality['CL'],s=30, alpha=0.3, edgecolors='b',label='CL')
@@ -468,123 +519,10 @@ def PlotBcClvsDegree(G,title,n):#,nomipersalvataggioBC,nomipersalvataggioCL): #n
 		#plt.savefig(nomipersalvataggioCL)	
 		
 		plt.show()
-	
-
-
-#%%
-
-
-
-import networkx as nx
-import pandas as pd
-import matplotlib.pyplot as plt
-import os
-import seaborn as sns
-import numpy as np
-
-
-directory = 'C:/Users/silvi/Desktop/Fisica/ComplexNetworks/progetto/ComplexNetworksProject/ComplexNetworksProject'
-#directory= '/home/caterina/Documenti/GitHub/ComplexNetworksProject'
-os.chdir(directory) 
-
-#%%
-NameVirusFile = ['string_interactions_WNV.tsv','string_interactions_varicella.tsv',
-				 'string_interactions_SARSCov.tsv','string_interactions_parechovirus2.tsv',
-				 'string_interactions_mumps.tsv','string_interactions_MARV.tsv',
-				 'string_interactions_lassa.tsv','string_interactions_InfluenzaA.tsv',
-				 'string_interactions_HTLV-1.tsv','string_interactions_HPV1a.tsv',
-				 'string_interactions_HIV1_553.tsv','string_interactions_hepatitisB.tsv',
-				 'string_interactions_ebola.tsv','string_interactions_dengue2.tsv',
-				 'string_interactions_cytomegalo.tsv','Covid19.txt']
-VirusNames=['WNV','Varicella zoster virus','SARS-CoV','Human parechovirus 2',
-			'Mumps virus','MARV','Lassa virus','Influenza A','HTLV1','HPV type 1a',
-			'HIV1','Hepatitis B','Ebola','Dengue type 2','Cytomegalo','SARS-CoV-2']
-
-
-
-
-
-#%%
-
-
-	
-###FUNZIONE PER DARE I NOMI AI FILE DEI GRAFICI
-#il nome del file diventa: Prefisso + nome virus + formato del file
-def FileNames(Prefix, FileType): 
-	newnames=[]
-	for a in range (len(VirusNames)):
-		newnames.append(f"{Prefix}{VirusNames[a]}{FileType}")
-	return newnames
-	
-	
-
-
-
-
-
-#%%  CREO RETI VIRUS
-
-G = []
-
-for i in range(len(NameVirusFile)):	
-	virus = pd.read_csv(NameVirusFile[i], sep="\t", usecols=['node1_external_id','node2_external_id', 'combined_score'])
-	
-	graph_virus = nx.DiGraph() 
-	for j in range(len(virus)):
-		graph_virus.add_edge(virus.iloc[j][0], virus.iloc[j][1], weight=virus.iloc[j][2])
-	print(nx.info(graph_virus))
-	G.append(graph_virus)
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-	
-	
-	
-
-#%%
-
-#%% algoritmo di clustering
-from networkx.algorithms.community.centrality import girvan_newman	
-#from networkx.algorithms.community import asyn_lpa_communities
-
-#%%
-alg = []
-for i in range(len(G)):
-	print(i+1)
-	alg.append(list(girvan_newman(G[i])))
-
-
-
-
-#%%
-
-
-
-
-for i in range(len(alg)):
-	print('len alg[',i,']: ', len(alg[i]))
-	for j in range(len(alg[i])):
-		print('    len alg[',i,'][',j,']: ', len(alg[i][j]))
-		for k in range(len(alg[i][j])):
-			print('        len alg[',i,'][',j,'][',k,']: ', len(alg[i][j][k]))
 		
- 
+		
 	
 	
-#%%	
 	
-grafico bc, degree, closeness in funz di nodi
-metti a posto programma
-scrivi qualcosa
-per size netowrk vuoi fare istogramma?
+	return
+	
