@@ -113,7 +113,7 @@ PP - (weighted) directed adjacency matrix
 OUTPUT:
 S_0 - canonical entropy of the undirected networks with the same degree distribution
 S_r - canonical entropy with fixed GLOBAL link density
-z - lagrange multipliers of degree sequence constraints (#node vector)
+z_in, z_out - lagrange multipliers of in and out degree sequence constraints (#node vector)
 P - link probability matrix Pij
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -159,7 +159,7 @@ def EntropyCanonicalDirected(PP):
 		D=np.ones((n,n))+z_in@z_in.T
 		
 		X=( U/D - np.diag(np.diag(U/D)) ).T
-		z = connectivity_in /np.reshape(X.sum(axis=0),(n,1))
+		z_in = connectivity_in /np.reshape(X.sum(axis=0),(n,1))
 		
 		z_in=np.maximum(z_in,10**(-15))
 		
@@ -228,7 +228,7 @@ def EntropyCanonicalDirected(PP):
 	print('S_r: ',S_r)
 	
 
-	return S_0, S_r, z, P
+	return S_0, S_r, z_in, z_out, P
 
 
 
@@ -251,8 +251,10 @@ GV - list of the corresponding human-virus networks
 Gsub - list of the correpsonding human subgraphs 
 
 OUTPUT:
-entropy - dataframe with S_0 and S_r values of entropy for each network
+entropy - dataframe with S_0, S_r values of entropy for each network 
 plot of entropy differences for each virus
+plot of entropy for each GV
+plot of entropy for each Gsub
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
