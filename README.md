@@ -32,8 +32,26 @@ Analysis of a network through measures of degree K, average neighbor degree Knn,
 - *PlotINvsOUT* returns a scatter plot of out degree vs in degree; it takes as input the dataframe defined by the first function and the title of the plot. It raises Error if the dataframe refers to an undirected network.
 - *PlotBcClvsDegree* returns two scatter plots, the first one of BC vs K and the second one of CL vs K. It takes as input the dataframe defined by the first function, the title of the plot and an integer number n. The values of K, BC and CL are also averaged over n number of nodes (ordered by degree). If the dataframe refers to an undirected network, Kin is considered. 
 - *Mean* takes as input an array of numbers and returns the mean with error. It is used to calculate the average values of K, BC and CL in the previous function.+ 
+
+
 #### Percolation.py
+It consists of the function *Percolation*. It takes as input a graph, the corresponding dataframe obtained by the function *NetworkCharacterization* of the previous file, and the name of the network and performs a percolation analysis on the given network. The size of the giant component is calculated after each removal of a single node. The percolation analysis is performed three times, each one following a different node removal order; in particular the nodes are ordered by descending betweenness centrality, descending degree and randomly. The function returns a plot of the size of the giant component vs the percentage of removed nodes and a three arrays (one for each removal method) containing the size of the giant component after each removal. 
+
+
 #### EntropyCanonical.py
+It calculates the Shannon entropy values of a series of networks and compares them. It consists of three functions:
+- *EntropyCanonicalUndirected* takes as input the adjacency matrix of a (weighted) undirected graph. It gives as output the canonical Shannon entropy S0, calculated by fixing the degree distribution, the canonical Shannon entropy Sr, calculated by fixing the total link probability, the lagrange multipliers of degree sequence constraints and the link probability matrix. The code is the translation in Python language of the MATLAB code *entropy_canonical.m* saw at lesson.
+- *EntropyCanonicalDirected* is the adaptation of the previous function in the case of a (weighted) directed network; 
+- *EntropyDifference* calculates Shannon entropy values of different networks, by using the two previous functions, and compares them. It takes as input two lists of networks that we want to compare (in our project they are respectively the list of Human-Virus PPI networks and the list of the corresponding Human PPI subnetworks) and the corresponding list of network names. It returns an array with S0 and Sr values for each group of network as columns and each row corresponding to a particular virus. Moreover, it returns three plots: 
+
+
+
+entropy - dataframe with S_0 and S_r values of entropy for each network
+plot of entropy differences for each virus
+
+
+
+
+
+
 #### MainCode.py
-
-
