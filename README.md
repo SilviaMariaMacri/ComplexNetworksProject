@@ -31,7 +31,7 @@ Analysis of a network through measures of degree K, average neighbor degree Knn,
 - *PlotDegreeNNvsDegree* returns a scatter plot of Knn vs K; it takes as input the dataframe defined by the first function and the title of the plot. If the dataframe refers to a directed network, two plots of Knn,in vs Kin and Knn,out vs Kout are distinguished.
 - *PlotINvsOUT* returns a scatter plot of out degree vs in degree; it takes as input the dataframe defined by the first function and the title of the plot. It raises Error if the dataframe refers to an undirected network.
 - *PlotBcClvsDegree* returns two scatter plots, the first one of BC vs K and the second one of CL vs K. It takes as input the dataframe defined by the first function, the title of the plot and an integer number n. The values of K, BC and CL are also averaged over n number of nodes (ordered by degree). If the dataframe refers to an undirected network, Kin is considered. 
-- *Mean* takes as input an array of numbers and returns the mean with error. It is used to calculate the average values of K, BC and CL in the previous function.+ 
+- *Mean* takes as input an array of numbers and returns the mean with the root mean square deviation. It is used to calculate the average values of K, BC and CL in the previous function.
 
 
 #### Percolation.py
@@ -47,4 +47,4 @@ It calculates the Shannon entropy values of a series of networks and compares th
 
 
 #### MainCode.py
-It defines the list of STRING files that we want to use and the corresponding list of virus names and creates all the networks through iterations of NetworkBuikder.py functions; Later, it iterates the functions of NetworkCharacterization.py, Percolation.py and EntropyCanonical.py over all the graphs.
+It imports all the functions of the previously described Python files, in order to obtain a complete analysis of all the networks. It defines the list of STRING files that we want to use and the corresponding list of virus names and creates all the networks through iterations of NetworkBuikder.py functions; Later, it iterates the functions of NetworkCharacterization.py, Percolation.py and EntropyCanonical.py over all the graphs.
