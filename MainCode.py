@@ -13,7 +13,7 @@ os.chdir(directory)
 
 
 # STRING file of human PPI network
-NameHumanFile='9606.protein.links.v11.0.txt'
+NameHumanFile='9606.protein.links.v11.0.txt.gz'
 
 # STRING files of human-virus PPI networks
 NameVirusFile = ['string_interactions_cytomegalo.tsv',
@@ -59,6 +59,9 @@ import NetworksBuilder
 
 #human PPI network
 GH=NetworksBuilder.HumanGraph(NameHumanFile,250,'human PPI')
+
+
+#%%
 #list of human-virus PPI
 GV=[] 
 for i in range (len(NameVirusFile)):
@@ -111,7 +114,7 @@ for i in range(len(Gsub)):
 
 
 
-#%%
+
 
 
 
@@ -155,7 +158,15 @@ for i in range(len(Gsub)):
 
 
 
+
+
+
+
 #%%  Percolation
+
+
+
+
 
 import Percolation
 
@@ -178,19 +189,3 @@ import EntropyCanonical
 E = EntropyCanonical.EntropyDifference(VirusNames,Gsub,GV)
 	
 
-
-
-
-
-#%%
-
-
-
-	
-###FUNZIONE PER DARE I NOMI AI FILE DEI GRAFICI
-#il nome del file diventa: Prefisso + nome virus + formato del file
-#def FileNames(Prefix, FileType): 
-#	newnames=[]
-#	for a in range (len(VirusNames)):
-#		newnames.append(f"{Prefix}{VirusNames[a]}{FileType}")
-#	return newnames

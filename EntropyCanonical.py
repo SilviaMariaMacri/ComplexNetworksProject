@@ -309,11 +309,18 @@ def EntropyDifference(VirusNames,Gsub,GV):
 	deltaS0 = entropy['S0 virus']-entropy['S0 sub']
 	deltaSr = entropy['Sr virus']-entropy['Sr sub']
 	
+	entropy['delta S0'] = deltaS0
+	entropy['delta Sr'] = deltaSr
+	
+	
+	
+	entropy = entropy.sort_values(by='delta S0', ascending=False)
+	
 
 	# plot of entropy differences
-	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,6))
-	ax.plot(VirusNames, deltaS0 , marker="o", label='$\Delta S_0$', linewidth=0.75)
-	ax.plot(VirusNames, deltaSr , marker="o", label='$\Delta S_r$', linewidth=0.75)
+	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,5))
+	ax.plot(entropy['Virus'], entropy['delta S0'] , marker="o", label='$\Delta S_0$', linewidth=0.75)
+	ax.plot(entropy['Virus'], entropy['delta Sr'] , marker="o", label='$\Delta S_r$', linewidth=0.75)
 	plt.grid(True)
 	plt.xticks(rotation=90)
 	ax.set_ylabel('$\Delta S$')
@@ -323,8 +330,8 @@ def EntropyDifference(VirusNames,Gsub,GV):
 	
 	#plot of entropy values GV
 	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,6))
-	ax.plot(VirusNames, entropy['S0 virus'], marker="o", label='$S_0$', linewidth=0.75)
-	ax.plot(VirusNames, entropy['Sr virus'], marker="o", label='$S_r$', linewidth=0.75)
+	ax.plot(entropy['Virus'], entropy['S0 virus'], marker="o", label='$S_0$', linewidth=0.75)
+	ax.plot(entropy['Virus'], entropy['Sr virus'], marker="o", label='$S_r$', linewidth=0.75)
 	plt.grid(True)
 	plt.xticks(rotation=90)
 	ax.set_title('Human-Virus PPI graphs')
@@ -335,8 +342,8 @@ def EntropyDifference(VirusNames,Gsub,GV):
 	
 	#plot of entropy values Gsub
 	fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,6))
-	ax.plot(VirusNames, entropy['S0 sub'], marker="o", label='$S_0$', linewidth=0.75)
-	ax.plot(VirusNames, entropy['Sr sub'], marker="o", label='$S_r$', linewidth=0.75)
+	ax.plot(entropy['Virus'], entropy['S0 sub'], marker="o", label='$S_0$', linewidth=0.75)
+	ax.plot(entropy['Virus'], entropy['Sr sub'], marker="o", label='$S_r$', linewidth=0.75)
 	plt.grid(True)
 	plt.xticks(rotation=90)
 	ax.set_title('Human PPI subgraphs')

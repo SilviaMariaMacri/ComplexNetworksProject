@@ -1,3 +1,25 @@
+
+
+
+
+
+
+#%%
+
+
+
+	
+###FUNZIONE PER DARE I NOMI AI FILE DEI GRAFICI
+#il nome del file diventa: Prefisso + nome virus + formato del file
+#def FileNames(Prefix, FileType): 
+#	newnames=[]
+#	for a in range (len(VirusNames)):
+#		newnames.append(f"{Prefix}{VirusNames[a]}{FileType}")
+#	return newnames
+
+
+
+#%%
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
