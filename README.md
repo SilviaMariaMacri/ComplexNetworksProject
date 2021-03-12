@@ -8,7 +8,7 @@ Data files downloaded from STRING database:
 
 
 Python codes:
-- NetworkBuilder.py(#NetworkBuilder.py): consists of three functions
+- [NetworkBuilder.py]: consists of three functions
 - NetworkCharacterization.py
 - Percolation.py
 - EntropyCanonical.py
