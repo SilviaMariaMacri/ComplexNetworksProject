@@ -292,7 +292,7 @@ def EntropyDifference(VirusNames,Gsub,GV):
 		
 		print('Gsub ',VirusNames[i])
 		PP = nx.to_pandas_adjacency(GV[i],weight='weight')
-		[S_0, S_r, z, P] = EntropyCanonicalDirected(PP)
+		[S_0, S_r, z_in, z_out, P] = EntropyCanonicalDirected(PP)
 		S0_virus.append(S_0)
 		Sr_virus.append(S_r)
 		#GV_number_nodes.append(GV[i].number_of_nodes())
@@ -305,7 +305,6 @@ def EntropyDifference(VirusNames,Gsub,GV):
 	
 	entropy_dict = {'Virus':VirusNames, 'S0 virus':S0_virus, 'Sr virus':Sr_virus, 'S0 sub':S0_sub, 'Sr sub':Sr_sub}
 	entropy = pd.DataFrame(data=entropy_dict)
-	#entropy.to_csv('Entropy.tsv', sep="\t", index=False) 
 	
 	
 	deltaS0 = entropy['S0 virus']-entropy['S0 sub']
@@ -313,10 +312,11 @@ def EntropyDifference(VirusNames,Gsub,GV):
 	
 	entropy['delta S0'] = deltaS0
 	entropy['delta Sr'] = deltaSr
+	#entropy.to_csv('Entropy.tsv', sep="\t", index=False) 
 	
 	
 	
-	entropy = entropy.sort_values(by='delta S0', ascending=False)
+	entropy = entropy.sort_values(by='delta Sr', ascending=False)
 	
 
 	# plot of entropy differences

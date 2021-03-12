@@ -9,6 +9,12 @@ os.chdir(directory)
 
 
 
+
+
+
+
+
+
 #%%  create human and human-virus PPI graphs 
 
 
@@ -60,8 +66,8 @@ import NetworksBuilder
 #human PPI network
 GH=NetworksBuilder.HumanGraph(NameHumanFile,250,'human PPI')
 
-
 #%%
+
 #list of human-virus PPI
 GV=[] 
 for i in range (len(NameVirusFile)):
@@ -100,6 +106,7 @@ for i in range(len(GV)):
 	# K, Kin, Kout, Knn_in, Knn_out, BC, CL
 	GV_centrality_i = NetworkCharacterization.NetworkCharacterization(GV[i])
 	GV_centrality.append(GV_centrality_i)
+	print('GV ',VirusNames[i],' completed')
 	
 	
 Gsub_centrality = []
@@ -108,6 +115,7 @@ for i in range(len(Gsub)):
 	# K, Knn, BC, CL
 	Gsub_centrality_i = NetworkCharacterization.NetworkCharacterization(Gsub[i])
 	Gsub_centrality.append(Gsub_centrality_i)
+	print('Gsub ',VirusNames[i],' completed')
 
 
 
@@ -128,7 +136,7 @@ NetworkCharacterization.PlotBcClvsDegree(GH_centrality,'Human PPI network',n)
 
 
 
-
+#%%
 
 # characterization plots of human-virus PPI networks 
 
@@ -143,18 +151,19 @@ for i in range(len(GV)):
 	n=21
 	NetworkCharacterization.PlotBcClvsDegree(GV_centrality[i],VirusNames[i],n)
 
+#%%
 
 
 # characterization plots of human PPI subgraphs
 
 for i in range(len(Gsub)):
 	# histogram of degree
-	NetworkCharacterization.PlotDegreeHist(Gsub_centrality[i],VirusNames[i])
+	#NetworkCharacterization.PlotDegreeHist(Gsub_centrality[i],VirusNames[i])
 	# Knn vs K
 	NetworkCharacterization.PlotDegreeNNvsDegree(Gsub_centrality[i],VirusNames[i])
 	# BC,CL vs K
 	n=21
-	NetworkCharacterization.PlotBcClvsDegree(Gsub_centrality[i],VirusNames[i],n)
+	#NetworkCharacterization.PlotBcClvsDegree(Gsub_centrality[i],VirusNames[i],n)
 
 
 

@@ -22,8 +22,9 @@ import seaborn as sns
         to a node of the network	
  if G directed:
 	df = array of three dataframes as entries: 
-	df[0] = dataframe with degree, In degree, Out degree, In degree of nearest neighbors, 
-            Out degree of nearest neighbors, betweenness centrality and closeness 
+	df[0] = dataframe with degree, In degree, Out degree, average degree of nearest neighbors, 
+	        (average In degree of nearest neighbors, average Out degree of nearest 
+		    neighbors), betweenness centrality and closeness 
             centrality as columns and each row corresponding to a node 
     df[1] = dataframe with same columns of df[0] and row corresponding only to 
             human nodes
@@ -70,11 +71,14 @@ def NetworkCharacterization(G):
 		degreeOUT.columns=['Nodes','Kout']
 		degreeOUT = degreeOUT['Kout']
 		
-		degNN_IN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='in', target='out',weight='weight'),orient='index',columns=['Kin_nn'])
-		degNN_IN = degNN_IN.set_index(np.arange(0,len(degNN_IN),1))
+		degNN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G, weight='weight'),orient='index',columns=['K_nn'])
+		degNN = degNN.set_index(np.arange(0,len(degNN),1))
 		
-		degNN_OUT = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='out', target='in',weight='weight'),orient='index',columns=['Kout_nn'])
-		degNN_OUT = degNN_OUT.set_index(np.arange(0,len(degNN_OUT),1))
+		#degNN_IN = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='in', target='in',weight='weight'),orient='index',columns=['Kin_nn'])
+		#degNN_IN = degNN_IN.set_index(np.arange(0,len(degNN_IN),1))
+		
+		#degNN_OUT = pd.DataFrame.from_dict(nx.average_neighbor_degree(G,source='out', target='out',weight='weight'),orient='index',columns=['Kout_nn'])
+		#degNN_OUT = degNN_OUT.set_index(np.arange(0,len(degNN_OUT),1))
 	
 		BC = pd.DataFrame.from_dict(nx.betweenness_centrality(G,weight='weight'),orient='index',columns=['BC'])
 		BC = BC.set_index(np.arange(0,len(BC),1))
@@ -84,7 +88,8 @@ def NetworkCharacterization(G):
 		
 		
 		
-		df_complete = pd.concat([degree,degreeIN,degreeOUT,degNN_IN,degNN_OUT,BC,CL], axis=1)
+		df_complete = pd.concat([degree,degreeIN,degreeOUT,degNN,#degNN_IN,degNN_OUT,
+						                                       BC,CL], axis=1)
 
 
 		#split dataframe in human and viral part
@@ -198,6 +203,7 @@ OUTPUT:
 
 def PlotDegreeNNvsDegree(centrality,title):#,nomi):
 
+
 	
 	# undirected network
 	if type(centrality) == pd.core.frame.DataFrame:
@@ -221,29 +227,45 @@ def PlotDegreeNNvsDegree(centrality,title):#,nomi):
 		human = centrality[1]
 		virus = centrality[2]
 		
+		
+		
+		
 		sns.set_style('whitegrid')
 		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
 		ax.set_title(title)
-		ax.scatter(human['Kin'],human['Kin_nn'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
-		ax.scatter(virus['Kin'],virus['Kin_nn'],s=30, alpha=0.5, edgecolors='r', label='Virus')
-		ax.set_xlabel('$K_{IN}$')
-		ax.set_ylabel('$K_{NN,IN}$')
+		ax.scatter(human['K'],human['K_nn'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
+		ax.scatter(virus['K'],virus['K_nn'],s=30, alpha=0.5, edgecolors='r', label='Virus')
+		ax.set_xlabel('K')
+		ax.set_ylabel('$K_{NN}$')
 		ax.legend()
 		
 		plt.show()
+		
+		
+		
+		#sns.set_style('whitegrid')
+		#fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
+		#ax.set_title(title)
+		#ax.scatter(human['Kin'],human['Kin_nn'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
+		#ax.scatter(virus['Kin'],virus['Kin_nn'],s=30, alpha=0.5, edgecolors='r', label='Virus')
+		#ax.set_xlabel('$K_{IN}$')
+		#ax.set_ylabel('$K_{NN,IN}$')
+		#ax.legend()
+		
+		#plt.show()
 	
-		sns.set_style('whitegrid')
-		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
-		ax.set_title(title)
-		ax.scatter(human['Kout'],human['Kout_nn'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
-		ax.scatter(virus['Kout'],virus['Kout_nn'],s=30, alpha=0.5, edgecolors='r', label='Virus')
-		ax.set_xlabel('$K_{OUT}$')
-		ax.set_ylabel('$K_{NN,OUT}$')
-		ax.legend()
+		#sns.set_style('whitegrid')
+		#fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,4))
+		#ax.set_title(title)
+		#ax.scatter(human['Kout'],human['Kout_nn'],s=30, alpha=0.5, edgecolors='b', label='Homo Sapiens')
+		#ax.scatter(virus['Kout'],virus['Kout_nn'],s=30, alpha=0.5, edgecolors='r', label='Virus')
+		#ax.set_xlabel('$K_{OUT}$')
+		#ax.set_ylabel('$K_{NN,OUT}$')
+		#ax.legend()
 
 		#plt.savefig(nomi)
 		
-		plt.show()
+		#plt.show()
 		
 		
 	return
@@ -316,7 +338,7 @@ INPUT:
 	array of numbers
 OUTPUT:
 	mu = average 
-	sigma = mean error
+	sigma = root mean square deviation
 '''
 
 
