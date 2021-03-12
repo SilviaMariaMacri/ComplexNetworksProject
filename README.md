@@ -8,7 +8,7 @@ Data files downloaded from STRING database:
 
 
 Python codes:
-- NetworkBuilder.py
+- NetworkBuilder.py: consists of three functions
 - NetworkCharacterization.py
 - Percolation.py
 - EntropyCanonical.py
@@ -18,4 +18,17 @@ Python codes:
 
 
 
+# Headline H1
+## Headline H2
+### Headline H3
+#### Headline H4 
+##### Headline H5
+###### Headline H6
+Nel caso di una documentazione estesa, un indice chiaro fornisce una buona visione d’insieme:
 
+## Table of Contents
+1. [General Info](#general-info)
+2. [Technologies](#technologies)
+3. [Installation](#installation)
+4. [Collaboration](#collaboration)
+5. [FAQs](#faqs)
