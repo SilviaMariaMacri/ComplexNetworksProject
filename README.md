@@ -15,9 +15,12 @@
 - MainCode.py
 
 
-## Description of the codes
+# Description of the codes
 
 #### NetworkBuilder.py
-
+#### NetworkCharacterization.py
+#### Percolation.py
+#### EntropyCanonical.py
+#### MainCode.py
 
 
