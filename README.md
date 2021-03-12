@@ -18,6 +18,10 @@
 # Description of the codes
 
 #### NetworkBuilder.py
+Creation of the graph from the STRING file. It consists of three functions:
+- \_HumanGraph\_ takes as input the STRING file, the lower limit on the link score we want to cosider and the name of the network that we want to create; the output is an undirected graph.
+- VirusGraph 
+
 #### NetworkCharacterization.py
 #### Percolation.py
 #### EntropyCanonical.py
