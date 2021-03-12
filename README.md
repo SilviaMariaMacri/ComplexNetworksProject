@@ -41,17 +41,10 @@ It consists of the function *Percolation*. It takes as input a graph, the corres
 #### EntropyCanonical.py
 It calculates the Shannon entropy values of a series of networks and compares them. It consists of three functions:
 - *EntropyCanonicalUndirected* takes as input the adjacency matrix of a (weighted) undirected graph. It gives as output the canonical Shannon entropy S0, calculated by fixing the degree distribution, the canonical Shannon entropy Sr, calculated by fixing the total link probability, the lagrange multipliers of degree sequence constraints and the link probability matrix. The code is the translation in Python language of the MATLAB code *entropy_canonical.m* saw at lesson.
-- *EntropyCanonicalDirected* is the adaptation of the previous function in the case of a (weighted) directed network; 
-- *EntropyDifference* calculates Shannon entropy values of different networks, by using the two previous functions, and compares them. It takes as input two lists of networks that we want to compare (in our project they are respectively the list of Human-Virus PPI networks and the list of the corresponding Human PPI subnetworks) and the corresponding list of network names. It returns an array with S0 and Sr values for each group of network as columns and each row corresponding to a particular virus. Moreover, it returns three plots: 
-
-
-
-entropy - dataframe with S_0 and S_r values of entropy for each network
-plot of entropy differences for each virus
-
-
-
+- *EntropyCanonicalDirected* is the adaptation of the previous function in the case of a (weighted) directed network. In this case two sets of lagrange multipliers are calculated, one corresponding to the in connectivity and the other corresponding to the out connectivity; the link probability matrix, used to calculate S0, is obtained by the superposition of the upper triangular link probability matrix corresponding to the out connectivity and the lower triangular one corresponding to the in connectivity. Sr in calculated by fixing the average connectivity as the mean of the in connectivity and the out connectivity.
+- *EntropyDifference* calculates Shannon entropy values of different networks, by using the two previous functions, and compares them. It takes as input two lists of networks that we want to compare (in our project they are respectively the list of Human-Virus PPI networks and the list of the corresponding Human PPI subnetworks) and the corresponding list of names of each pair of networks. It returns an array with S0 and Sr values for each group of network as columns and each row corresponding to a particular network pair. Moreover, it returns three plots: the first one shows the difference of the entropy values between each pair of network, the second and the third ones show the absolute entropy values for each graph of the two groups of networks.
 
 
 
 #### MainCode.py
+It defines the list of STRING files that we want to use and the corresponding list of virus names and creates all the networks through iterations of NetworkBuikder.py functions; Later, it iterates the functions of NetworkCharacterization.py, Percolation.py and EntropyCanonical.py over all the graphs.
