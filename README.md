@@ -4,6 +4,7 @@
 - '9606.protein.links.v11.0.txt.gz', representing Human PPI network. 
 (https://string-db.org/cgi/download?sessionId=%24input-%3E%7BsessionId%7D&species_text=Homo+sapiens)
 - 15 files .tsv, representing Human-Virus PPI networks of the following viruses: Cytomegalo, Dengue type 2, Ebola, Hepatitis B, HIV1, HPV type 1a, HTLV1, Influenza A, Lassa virus, MARV, Mumps virus, Human parechovirus 2, SARS-CoV, Varicella zoster virus, WNV. (http://viruses.string-db.org)
+- 'Covid19.txt', representing the human-Sars-Cov-2 PPI network; it is an adaptation of bla bla bla in the link riadattato su modello di string con nomi proteine ecc
 
 
 
@@ -28,7 +29,7 @@ Creation of the graph from the STRING file. It consists of three functions:
 Analysis of a network through measures of degree K, average neighbor degree Knn, betweenness centrality BC and closeness centrality CL. It consists of six functions:
 - *NetworkCharacterization* takes as input a graph; the output is different in case of undirected and directed graph. In case of undirected graph (in our project representing a Human-Virus PPI network), it returns an array of three dataframes: the first one has K, vKin, Kout, Knn,in, Knn,out, BC and CL as column and each row corresponding to a node; the second one is a selection of the rows of the first dataframe corresponding to human proteins; the third one is a selection of the rows of the first dataframe corresponding to virus protein. In case of directed graph (in our project representing a Human PPI subgraph), it returns a dataframe with K, Knn, BC anc CL as columns and each row corresponding to a node.
 - *PlotDegreeHist* returns the plot of histogram degree; it takes as input the dataframe defined by the first function and the title of the plot. If the dataframe refers to a directed network, two plots of in degree histogram and out degree histogram are distinguished. 
-- *PlotDegreeNNvsDegree* returns a scatter plot of Knn vs K; it takes as input the dataframe defined by the first function and the title of the plot. If the dataframe refers to a directed network, two plots of Knn,in vs Kin and Knn,out vs Kout are distinguished.
+- *PlotDegreeNNvsDegree* returns a scatter plot of Knn vs K; it takes as input the dataframe defined by the first function and the title of the plot. 
 - *PlotINvsOUT* returns a scatter plot of out degree vs in degree; it takes as input the dataframe defined by the first function and the title of the plot. It raises Error if the dataframe refers to an undirected network.
 - *PlotBcClvsDegree* returns two scatter plots, the first one of BC vs K and the second one of CL vs K. It takes as input the dataframe defined by the first function, the title of the plot and an integer number n. The values of K, BC and CL are also averaged over n number of nodes (ordered by degree). If the dataframe refers to an undirected network, Kin is considered. 
 - *Mean* takes as input an array of numbers and returns the mean with the root mean square deviation. It is used to calculate the average values of K, BC and CL in the previous function.
