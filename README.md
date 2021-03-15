@@ -4,9 +4,7 @@
 - '9606.protein.links.v11.0.txt.gz', representing Human PPI network. 
 (https://string-db.org/cgi/download?sessionId=%24input-%3E%7BsessionId%7D&species_text=Homo+sapiens)
 - 15 files .tsv, representing Human-Virus PPI networks of the following viruses: Cytomegalo, Dengue type 2, Ebola, Hepatitis B, HIV1, HPV type 1a, HTLV1, Influenza A, Lassa virus, MARV, Mumps virus, Human parechovirus 2, SARS-CoV, Varicella zoster virus, WNV. (http://viruses.string-db.org)
-- 'Covid19.txt', representing the human-Sars-Cov-2 PPI network; it is an adaptation of bla bla bla in the link riadattato su modello di string con nomi proteine ecc
-
-
+- 'Covid19.txt', representing the human-Sars-Cov-2 PPI network; the data were downloaded from https://github.com/momeara/BioChemPantry/tree/master/vignette/COVID19 and adapted in order to follow the STRING protein labeling.
 
 ### Python codes:
 - NetworkBuilder.py
