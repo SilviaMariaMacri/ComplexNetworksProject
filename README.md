@@ -46,4 +46,4 @@ It calculates the Shannon entropy values of a series of networks and compares th
 
 
 #### MainCode.py
-It imports all the functions of the previously described Python files, in order to obtain a complete analysis of all the networks. It defines the list of STRING files that we want to use and the corresponding list of virus names and creates all the networks through iterations of NetworkBuikder.py functions; Later, it iterates the functions of NetworkCharacterization.py, Percolation.py and EntropyCanonical.py over all the graphs.
+It imports all the functions of the previously described Python files, in order to obtain a complete analysis of all the networks. It defines the list of STRING files that we want to use and the corresponding list of virus names and creates all the networks through iterations of NetworkBuikder.py functions; then, it iterates the functions of NetworkCharacterization.py, Percolation.py and EntropyCanonical.py over all the graphs.
