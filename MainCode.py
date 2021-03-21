@@ -158,12 +158,12 @@ for i in range(len(GV)):
 
 for i in range(len(Gsub)):
 	# histogram of degree
-	#NetworkCharacterization.PlotDegreeHist(Gsub_centrality[i],VirusNames[i])
+	NetworkCharacterization.PlotDegreeHist(Gsub_centrality[i],VirusNames[i])
 	# Knn vs K
 	NetworkCharacterization.PlotDegreeNNvsDegree(Gsub_centrality[i],VirusNames[i])
 	# BC,CL vs K
 	n=21
-	#NetworkCharacterization.PlotBcClvsDegree(Gsub_centrality[i],VirusNames[i],n)
+	NetworkCharacterization.PlotBcClvsDegree(Gsub_centrality[i],VirusNames[i],n)
 
 
 
@@ -186,6 +186,9 @@ for i in range(len(GV)):
 
 for i in range(len(Gsub)):
 	Percolation.Percolation(Gsub[i], Gsub_centrality[i], VirusNames[i])
+	
+	
+
 	
 	
 	
