@@ -10,6 +10,7 @@ import pandas as pd
 
 # Input:  STRING file 
 #         minimum link score (= integer between 0 and 1000) 
+#         name of the graph
   
 def HumanGraph(NameHumanFile, threshold_score, graph_name): 
  	
@@ -35,6 +36,7 @@ def HumanGraph(NameHumanFile, threshold_score, graph_name):
 'Create Virus DIRECTED GRAPH'
 
 # Input:   STRING file 
+#          name of the graph
 
 def VirusGraph(NameVirusFile, graph_name):
 	
